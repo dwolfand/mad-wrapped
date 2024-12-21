@@ -39,6 +39,10 @@ function App() {
         { month: "Nov", count: 13 },
         { month: "Dec", count: 12 },
       ],
+      favoriteLocation: {
+        name: "Dupont",
+        percentage: 85,
+      },
     };
 
     setTimeout(() => {

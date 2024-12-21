@@ -1,7 +1,7 @@
 .slideshow {
   width: 100%;
   max-width: 800px;
-  min-height: 500px;
+  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -9,6 +9,7 @@
   padding: 2rem;
   cursor: pointer;
   position: relative;
+  touch-action: pan-y pinch-zoom;
 }
 
 .slide {
@@ -138,7 +139,7 @@
 /* Progress Dots */
 .progress-dots {
   display: flex;
-  gap: 0.5rem;
+  gap: 1rem;
   margin-top: 2rem;
 }
 
@@ -149,6 +150,21 @@
   background-color: var(--text-secondary);
   opacity: 0.3;
   transition: opacity 0.3s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.dot::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  right: -8px;
+  bottom: -8px;
+}
+
+.dot:hover {
+  opacity: 0.6;
 }
 
 .dot.active {

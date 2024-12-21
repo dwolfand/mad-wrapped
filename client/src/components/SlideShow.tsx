@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import { WorkoutStats } from "../types";
 import "./SlideShow.css";
 
@@ -9,6 +9,44 @@ interface SlideShowProps {
 
 const SlideShow = ({ stats }: SlideShowProps) => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const swipeConfidenceThreshold = 10000;
+  const swipePower = (offset: number, velocity: number) => {
+    return Math.abs(offset) * velocity;
+  };
+
+  const paginate = (direction: number) => {
+    setCurrentSlide((prev) => {
+      const nextSlide = prev + direction;
+      if (nextSlide < 0) return slides.length - 1;
+      if (nextSlide >= slides.length) return 0;
+      return nextSlide;
+    });
+  };
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === "ArrowLeft") {
+      paginate(-1);
+    } else if (event.key === "ArrowRight") {
+      paginate(1);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  const handleDragEnd = (
+    event: MouseEvent | TouchEvent | PointerEvent,
+    info: PanInfo
+  ) => {
+    const swipe = swipePower(info.offset.x, info.velocity.x);
+    if (swipe < -swipeConfidenceThreshold) {
+      paginate(1);
+    } else if (swipe > swipeConfidenceThreshold) {
+      paginate(-1);
+    }
+  };
 
   const slides = [
     {
@@ -64,6 +102,16 @@ const SlideShow = ({ stats }: SlideShowProps) => {
       ),
     },
     {
+      id: "favorite-location",
+      content: (
+        <>
+          <h2>Your MAD Home</h2>
+          <div className="stat-text">{stats.favoriteLocation.name}</div>
+          <p>{stats.favoriteLocation.percentage}% of your classes were here</p>
+        </>
+      ),
+    },
+    {
       id: "monthly-progress",
       content: (
         <>
@@ -105,20 +153,20 @@ const SlideShow = ({ stats }: SlideShowProps) => {
     },
   ];
 
-  const handleClick = () => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length);
-  };
-
   return (
-    <div className="slideshow" onClick={handleClick}>
+    <div className="slideshow" onClick={() => paginate(1)}>
       <AnimatePresence mode="wait">
         <motion.div
           key={currentSlide}
           className="slide"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.5 }}
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -50 }}
+          transition={{ duration: 0.3 }}
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={1}
+          onDragEnd={handleDragEnd}
         >
           {slides[currentSlide].content}
         </motion.div>
@@ -128,6 +176,10 @@ const SlideShow = ({ stats }: SlideShowProps) => {
           <div
             key={index}
             className={`dot ${index === currentSlide ? "active" : ""}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              setCurrentSlide(index);
+            }}
           />
         ))}
       </div>

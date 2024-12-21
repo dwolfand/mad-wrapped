@@ -15,6 +15,10 @@ export interface WorkoutStats {
   earlyBirdScore: number; // Percentage of early morning classes
   topThreeTimeSlots: string[];
   classesPerMonth: { month: string; count: number }[];
+  favoriteLocation: {
+    name: string;
+    percentage: number;
+  };
 }
 
 export interface AnimationState {
