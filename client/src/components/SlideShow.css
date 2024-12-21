@@ -1,0 +1,158 @@
+.slideshow {
+  width: 100%;
+  max-width: 800px;
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  cursor: pointer;
+  position: relative;
+}
+
+.slide {
+  text-align: center;
+  width: 100%;
+}
+
+.slide h2 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: var(--text-primary);
+  background: linear-gradient(45deg, var(--mad-dark-green), var(--mad-light-green));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: bold;
+}
+
+.stat-number {
+  font-size: 5rem;
+  font-weight: bold;
+  margin: 1.5rem 0;
+  background: linear-gradient(45deg, var(--mad-dark-green), var(--mad-light-green), var(--secondary-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 30px rgba(6, 199, 166, 0.3);
+}
+
+.stat-text {
+  font-size: 3.5rem;
+  font-weight: bold;
+  margin: 1.5rem 0;
+  background: linear-gradient(45deg, var(--mad-dark-green), var(--mad-light-green));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 30px rgba(6, 199, 166, 0.3);
+}
+
+/* Time Patterns */
+.time-patterns {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.pattern-item {
+  text-align: center;
+}
+
+.highlight {
+  display: block;
+  font-size: 2rem;
+  font-weight: bold;
+  background: linear-gradient(45deg, var(--mad-dark-green), var(--mad-light-green));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 0 20px rgba(6, 199, 166, 0.3);
+}
+
+/* Monthly Chart */
+.monthly-chart {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  height: 200px;
+  margin: 2rem 0;
+  padding: 1rem;
+  gap: 8px;
+}
+
+.month-bar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+}
+
+.bar {
+  width: 100%;
+  background: linear-gradient(180deg, var(--mad-dark-green), var(--mad-green), var(--mad-light-green));
+  border-radius: 4px 4px 0 0;
+  max-width: 30px;
+  box-shadow: 0 0 20px rgba(6, 199, 166, 0.2);
+}
+
+.month-label {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.count-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+
+/* Booking Stats */
+.booking-stats {
+  display: flex;
+  justify-content: center;
+  gap: 4rem;
+  margin: 2rem 0;
+}
+
+.booking-item {
+  text-align: center;
+}
+
+.stat-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--mad-dark-green), var(--mad-green), var(--mad-light-green));
+  color: white;
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin: 0 auto 1rem;
+  box-shadow: 0 0 30px rgba(6, 199, 166, 0.2);
+}
+
+/* Progress Dots */
+.progress-dots {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 2rem;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--text-secondary);
+  opacity: 0.3;
+  transition: opacity 0.3s ease;
+}
+
+.dot.active {
+  opacity: 1;
+  background: linear-gradient(45deg, var(--mad-dark-green), var(--mad-light-green));
+  box-shadow: 0 0 10px rgba(6, 199, 166, 0.5);
+} 

@@ -1,0 +1,70 @@
+.intro-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #121212 0%, #1e1e1e 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  z-index: 1000;
+  cursor: pointer;
+}
+
+.intro-content {
+  text-align: center;
+  padding: 2rem;
+}
+
+.mad-logo {
+  width: 300px;
+  height: auto;
+  margin-bottom: 2rem;
+  filter: drop-shadow(0 0 20px rgba(6, 199, 166, 0.3));
+}
+
+.intro-content h1 {
+  font-size: 3rem;
+  margin-bottom: 2rem;
+  background: linear-gradient(45deg, var(--mad-dark-green), var(--mad-green), var(--mad-light-green), var(--secondary-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: bold;
+  text-shadow: 0 0 30px rgba(6, 199, 166, 0.3);
+}
+
+.user-info {
+  margin: 2rem 0;
+}
+
+.user-info h2 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(45deg, var(--mad-dark-green), var(--mad-light-green));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 20px rgba(6, 199, 166, 0.3);
+}
+
+.user-info p {
+  color: #888;
+  font-size: 1.2rem;
+}
+
+.start-prompt {
+  margin-top: 3rem;
+  font-size: 1.2rem;
+  background: linear-gradient(45deg, var(--mad-dark-green), var(--mad-light-green));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: pulse 2s infinite;
+  text-shadow: 0 0 15px rgba(6, 199, 166, 0.3);
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+} 
