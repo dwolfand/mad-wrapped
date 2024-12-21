@@ -98,7 +98,10 @@
   height: 200px;
   margin: 2rem 0;
   padding: 1rem;
-  gap: 8px;
+  gap: 4px;
+  width: 100%;
+  overflow: visible;
+  -webkit-overflow-scrolling: touch;
 }
 
 .month-bar {
@@ -107,13 +110,14 @@
   flex-direction: column;
   align-items: center;
   height: 100%;
+  min-width: 24px;
 }
 
 .bar {
   width: 100%;
   background: linear-gradient(180deg, var(--mad-dark-green), var(--mad-green), var(--mad-light-green));
   border-radius: 4px 4px 0 0;
-  max-width: 30px;
+  max-width: 24px;
   box-shadow: 0 0 20px rgba(6, 199, 166, 0.2);
 }
 
@@ -121,6 +125,11 @@
   margin-top: 0.5rem;
   font-size: 0.8rem;
   color: var(--text-secondary);
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  height: 40px;
+  text-align: center;
 }
 
 .count-label {
@@ -129,12 +138,96 @@
   margin-top: 0.25rem;
 }
 
+@media (max-width: 480px) {
+  .monthly-chart {
+    height: 150px;
+    padding: 0.5rem;
+    margin: 1rem 0;
+    gap: 2px;
+    transform: scale(0.85);
+    transform-origin: center center;
+  }
+
+  .month-bar {
+    min-width: 16px;
+  }
+
+  .bar {
+    max-width: 16px;
+  }
+
+  .month-label {
+    font-size: 0.65rem;
+    height: 24px;
+  }
+
+  .count-label {
+    font-size: 0.65rem;
+  }
+
+  .slide h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Time Patterns mobile styles */
+  .time-patterns {
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+
+  .highlight {
+    font-size: 1.4rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .pattern-item p {
+    font-size: 0.8rem;
+  }
+
+  /* Adjust other stats for mobile */
+  .stat-number {
+    font-size: 3.5rem;
+    margin: 1rem 0;
+  }
+
+  .stat-text {
+    font-size: 2.5rem;
+    margin: 1rem 0;
+  }
+
+  .slide-container {
+    padding: 0.75rem;
+  }
+
+  /* Booking Stats mobile styles */
+  .booking-stats {
+    flex-direction: column;
+    gap: 0.75rem;
+    margin: 1rem 0;
+    padding: 0.75rem;
+  }
+
+  .booking-stats .stat-circle {
+    width: 52px;
+    height: 52px;
+    font-size: 1.3rem;
+    margin: 0 auto 0.25rem;
+    box-shadow: 0 0 15px rgba(6, 199, 166, 0.15);
+  }
+
+  .booking-stats .booking-item p {
+    font-size: 0.85rem;
+  }
+}
+
 /* Booking Stats */
 .booking-stats {
   display: flex;
   justify-content: center;
   gap: 4rem;
   margin: 2rem 0;
+  padding: 1rem;
 }
 
 .booking-item {

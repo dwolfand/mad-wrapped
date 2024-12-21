@@ -1,11 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  motion,
-  AnimatePresence,
-  PanInfo,
-  useMotionValue,
-  useTransform,
-} from "framer-motion";
+import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import { WorkoutStats } from "../types";
 import "./SlideShow.css";
 
@@ -16,17 +10,7 @@ interface SlideShowProps {
 const SlideShow = ({ stats }: SlideShowProps) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [dragDirection, setDragDirection] = useState<number>(0);
-  const swipeConfidenceThreshold = 10000;
-
-  // Motion values for drag feedback
-  const dragX = useMotionValue(0);
-  const dragOpacity = useTransform(dragX, [-200, 0, 200], [0.5, 1, 0.5]);
-  const dragScale = useTransform(dragX, [-200, 0, 200], [0.95, 1, 0.95]);
-  const dragRotate = useTransform(dragX, [-200, 0, 200], [5, 0, -5]);
-
-  const swipePower = (offset: number, velocity: number) => {
-    return Math.abs(offset) * velocity;
-  };
+  const swipeConfidenceThreshold = 50;
 
   const paginate = (direction: number) => {
     setCurrentSlide((prev) => {
@@ -54,10 +38,9 @@ const SlideShow = ({ stats }: SlideShowProps) => {
     _event: MouseEvent | TouchEvent | PointerEvent,
     info: PanInfo
   ) => {
-    const swipe = swipePower(info.offset.x, info.velocity.x);
-    if (swipe < -swipeConfidenceThreshold) {
+    if (info.offset.x < -swipeConfidenceThreshold) {
       paginate(1);
-    } else if (swipe > swipeConfidenceThreshold) {
+    } else if (info.offset.x > swipeConfidenceThreshold) {
       paginate(-1);
     }
   };
@@ -186,15 +169,9 @@ const SlideShow = ({ stats }: SlideShowProps) => {
           <motion.div
             key={currentSlide}
             className="slide"
-            style={{
-              x: dragX,
-              opacity: dragOpacity,
-              scale: dragScale,
-              rotate: dragRotate,
-            }}
-            initial={{ opacity: 0, x: 50 * dragDirection, scale: 0.8 }}
-            animate={{ opacity: 1, x: 0, scale: 1 }}
-            exit={{ opacity: 0, x: -50 * dragDirection, scale: 0.8 }}
+            initial={{ opacity: 0, x: 50 * dragDirection }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -50 * dragDirection }}
             transition={{
               type: "spring",
               stiffness: 300,
@@ -202,7 +179,7 @@ const SlideShow = ({ stats }: SlideShowProps) => {
             }}
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.7}
+            dragElastic={0}
             onDrag={handleDrag}
             onDragEnd={handleDragEnd}
             whileTap={{ cursor: "grabbing" }}
