@@ -1,5 +1,11 @@
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence, PanInfo } from "framer-motion";
+import {
+  motion,
+  AnimatePresence,
+  PanInfo,
+  useMotionValue,
+  useTransform,
+} from "framer-motion";
 import { WorkoutStats } from "../types";
 import "./SlideShow.css";
 
@@ -9,7 +15,15 @@ interface SlideShowProps {
 
 const SlideShow = ({ stats }: SlideShowProps) => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [dragDirection, setDragDirection] = useState<number>(0);
   const swipeConfidenceThreshold = 10000;
+
+  // Motion values for drag feedback
+  const dragX = useMotionValue(0);
+  const dragOpacity = useTransform(dragX, [-200, 0, 200], [0.5, 1, 0.5]);
+  const dragScale = useTransform(dragX, [-200, 0, 200], [0.95, 1, 0.95]);
+  const dragRotate = useTransform(dragX, [-200, 0, 200], [5, 0, -5]);
+
   const swipePower = (offset: number, velocity: number) => {
     return Math.abs(offset) * velocity;
   };
@@ -37,7 +51,7 @@ const SlideShow = ({ stats }: SlideShowProps) => {
   }, []);
 
   const handleDragEnd = (
-    event: MouseEvent | TouchEvent | PointerEvent,
+    _event: MouseEvent | TouchEvent | PointerEvent,
     info: PanInfo
   ) => {
     const swipe = swipePower(info.offset.x, info.velocity.x);
@@ -46,6 +60,13 @@ const SlideShow = ({ stats }: SlideShowProps) => {
     } else if (swipe > swipeConfidenceThreshold) {
       paginate(-1);
     }
+  };
+
+  const handleDrag = (
+    _event: MouseEvent | TouchEvent | PointerEvent,
+    info: PanInfo
+  ) => {
+    setDragDirection(info.offset.x > 0 ? -1 : 1);
   };
 
   const slides = [
@@ -154,35 +175,73 @@ const SlideShow = ({ stats }: SlideShowProps) => {
   ];
 
   return (
-    <div className="slideshow" onClick={() => paginate(1)}>
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={currentSlide}
-          className="slide"
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -50 }}
-          transition={{ duration: 0.3 }}
-          drag="x"
-          dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={1}
-          onDragEnd={handleDragEnd}
-        >
-          {slides[currentSlide].content}
-        </motion.div>
-      </AnimatePresence>
-      <div className="progress-dots">
+    <div className="slideshow">
+      <motion.div
+        className="slide-container"
+        whileHover={{ scale: 1.02 }}
+        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+        onClick={() => paginate(1)}
+      >
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentSlide}
+            className="slide"
+            style={{
+              x: dragX,
+              opacity: dragOpacity,
+              scale: dragScale,
+              rotate: dragRotate,
+            }}
+            initial={{ opacity: 0, x: 50 * dragDirection, scale: 0.8 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: -50 * dragDirection, scale: 0.8 }}
+            transition={{
+              type: "spring",
+              stiffness: 300,
+              damping: 30,
+            }}
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.7}
+            onDrag={handleDrag}
+            onDragEnd={handleDragEnd}
+            whileTap={{ cursor: "grabbing" }}
+          >
+            {slides[currentSlide].content}
+          </motion.div>
+        </AnimatePresence>
+      </motion.div>
+
+      <motion.div
+        className="progress-dots"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+      >
         {slides.map((_, index) => (
-          <div
+          <motion.div
             key={index}
             className={`dot ${index === currentSlide ? "active" : ""}`}
             onClick={(e) => {
               e.stopPropagation();
               setCurrentSlide(index);
             }}
+            whileHover={{ scale: 1.5 }}
+            whileTap={{ scale: 0.9 }}
+            animate={
+              index === currentSlide
+                ? {
+                    scale: [1, 1.2, 1],
+                    transition: {
+                      duration: 0.5,
+                      ease: "easeInOut",
+                    },
+                  }
+                : {}
+            }
           />
         ))}
-      </div>
+      </motion.div>
     </div>
   );
 };

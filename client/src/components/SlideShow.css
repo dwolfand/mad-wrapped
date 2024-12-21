@@ -7,14 +7,34 @@
   justify-content: center;
   align-items: center;
   padding: 2rem;
-  cursor: pointer;
   position: relative;
   touch-action: pan-y pinch-zoom;
+  perspective: 1000px;
+}
+
+.slide-container {
+  width: 100%;
+  cursor: pointer;
+  border-radius: 20px;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+.slide-container:hover {
+  box-shadow: 0 12px 48px rgba(6, 199, 166, 0.2);
 }
 
 .slide {
   text-align: center;
   width: 100%;
+  cursor: grab;
+}
+
+.slide:active {
+  cursor: grabbing;
 }
 
 .slide h2 {
@@ -141,6 +161,10 @@
   display: flex;
   gap: 1rem;
   margin-top: 2rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
 }
 
 .dot {
@@ -149,7 +173,7 @@
   border-radius: 50%;
   background-color: var(--text-secondary);
   opacity: 0.3;
-  transition: opacity 0.3s ease;
+  transition: all 0.3s ease;
   cursor: pointer;
   position: relative;
 }
@@ -165,6 +189,7 @@
 
 .dot:hover {
   opacity: 0.6;
+  box-shadow: 0 0 12px rgba(6, 199, 166, 0.3);
 }
 
 .dot.active {
