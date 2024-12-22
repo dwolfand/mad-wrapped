@@ -139,12 +139,14 @@
   transform: rotate(180deg);
   height: 40px;
   text-align: center;
+  font-weight: 600;
 }
 
 .count-label {
   font-size: 0.8rem;
   color: var(--text-secondary);
   margin-top: 0.25rem;
+  font-weight: 600;
 }
 
 @media (max-width: 480px) {
@@ -350,6 +352,7 @@
   color: var(--text-secondary);
   font-size: 0.8rem;
   margin: 0;
+  font-weight: 600;
 }
 
 @media (max-width: 480px) {
@@ -416,6 +419,7 @@
   color: var(--text-secondary);
   font-size: 0.8rem;
   margin: 0;
+  font-weight: 600;
 }
 
 @media (max-width: 480px) {
@@ -450,6 +454,7 @@
   font-size: 1rem;
   color: var(--text-secondary);
   margin: 5px 0;
+  font-weight: 600;
 }
 
 @media (max-width: 480px) {
@@ -494,6 +499,7 @@
 .percentile-context {
   font-size: 0.9rem;
   color: var(--text-secondary);
+  font-weight: 600;
 }
 
 @media (max-width: 480px) {
