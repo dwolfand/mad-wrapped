@@ -89,3 +89,44 @@ body {
 .read-the-docs {
   color: #888;
 }
+
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  text-align: center;
+  gap: 20px;
+}
+
+.error {
+  color: #ff4444;
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+.view-example-btn {
+  background-color: var(--mad-green);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.view-example-btn:hover {
+  background-color: var(--mad-light-green);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.view-example-btn:active {
+  transform: translateY(0);
+  background-color: var(--mad-dark-green);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
