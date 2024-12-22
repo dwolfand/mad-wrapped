@@ -5,6 +5,11 @@ import SlideShow from "./components/SlideShow";
 import IntroAnimation from "./components/IntroAnimation";
 import "./App.css";
 
+// API URL based on environment
+const API_BASE_URL = import.meta.env.PROD
+  ? "https://api-broken-bird-1053.fly.dev" // Production URL
+  : "http://localhost:3001"; // Development URL
+
 function App() {
   const [stats, setStats] = useState<WorkoutStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -32,9 +37,7 @@ function App() {
           return;
         }
 
-        const response = await fetch(
-          `http://localhost:3001/api/stats/${clientId}`
-        );
+        const response = await fetch(`${API_BASE_URL}/api/stats/${clientId}`);
 
         if (!response.ok) {
           if (response.status === 404) {

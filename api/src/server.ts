@@ -1,52 +1,97 @@
 import express from "express";
-import { MongoClient } from "mongodb";
 import cors from "cors";
 import dotenv from "dotenv";
+import fs from "fs";
+import path from "path";
+
+console.log("Starting server");
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 3001;
+const port = parseInt(process.env.PORT || "8080", 10);
+const host = "0.0.0.0";
 
-// MongoDB configuration from environment variables
-const mongoUrl = process.env.MONGODB_URI || "mongodb://localhost:27017";
-const dbName = process.env.MONGODB_DB_NAME || "mad_wrapped";
+console.log("Server starting on port", port);
+
+// CORS configuration
+const corsOptions = {
+  origin: [
+    "http://localhost:5173", // Local development
+    "http://localhost:4173", // Local preview
+    "https://madwrapped.com", // Production domain
+    "https://www.madwrapped.com", // Production www subdomain
+  ],
+  methods: ["GET"], // Only allow GET requests
+  credentials: true,
+};
 
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
-let client: MongoClient;
+// Try to find the stats file in different locations
+function findStatsFile() {
+  const possiblePaths = [
+    path.join(__dirname, "../data/workout_stats.json"), // Production path
+    path.join(__dirname, "../../data/workout_stats.json"), // Development path
+  ];
 
-// Connect to MongoDB
-async function connectToMongo() {
+  for (const filePath of possiblePaths) {
+    if (fs.existsSync(filePath)) {
+      console.log(`Found stats file at: ${filePath}`);
+      return filePath;
+    }
+  }
+
+  console.log("No stats file found, creating a new one");
+  const defaultPath = possiblePaths[0];
+  const defaultDir = path.dirname(defaultPath);
+
+  if (!fs.existsSync(defaultDir)) {
+    fs.mkdirSync(defaultDir, { recursive: true });
+  }
+
+  fs.writeFileSync(defaultPath, JSON.stringify({}, null, 2));
+  return defaultPath;
+}
+
+const STATS_FILE = findStatsFile();
+
+// Function to read stats
+function readStats() {
   try {
-    client = new MongoClient(mongoUrl);
-    await client.connect();
-    console.log("Connected to MongoDB at", mongoUrl);
-    console.log("Using database:", dbName);
+    const data = fs.readFileSync(STATS_FILE, "utf-8");
+    return JSON.parse(data);
   } catch (error) {
-    console.error("Error connecting to MongoDB:", error);
-    process.exit(1);
+    console.error("Error reading stats file:", error);
+    return {};
+  }
+}
+
+// Function to write stats
+function writeStats(stats: any) {
+  try {
+    fs.writeFileSync(STATS_FILE, JSON.stringify(stats, null, 2));
+  } catch (error) {
+    console.error("Error writing stats file:", error);
   }
 }
 
 // Get stats by clientId endpoint
-app.get("/api/stats/:clientId", async (req, res) => {
+app.get("/api/stats/:clientId", (req, res) => {
   try {
     const { clientId } = req.params;
+    const stats = readStats();
 
-    const db = client.db(dbName);
-    const stats = await db.collection("workout_stats").findOne({ clientId });
-
-    if (!stats) {
+    if (!stats[clientId]) {
       return res
         .status(404)
         .json({ error: "Stats not found for this client ID" });
     }
 
-    res.json(stats);
+    res.json(stats[clientId]);
   } catch (error) {
     console.error("Error fetching stats:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -59,19 +104,11 @@ app.get("/api/health", (req, res) => {
 });
 
 // Start server
-async function startServer() {
-  await connectToMongo();
-
-  app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+function startServer() {
+  app.listen(port, host, () => {
+    console.log(`Server running on ${host}:${port}`);
   });
+  console.log("Server started");
 }
 
-// Graceful shutdown
-process.on("SIGTERM", async () => {
-  console.log("SIGTERM signal received: closing HTTP server");
-  await client?.close();
-  process.exit(0);
-});
-
-startServer().catch(console.error);
+startServer();
