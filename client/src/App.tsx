@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { WorkoutStats } from "./types/stats";
 import SlideShow from "./components/SlideShow";
 import IntroAnimation from "./components/IntroAnimation";
@@ -14,6 +14,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [showIntro, setShowIntro] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [clientId, setClientId] = useState("");
 
   // Helper function to format the date
   const formatMemberSince = (dateStr: string) => {
@@ -21,12 +22,12 @@ function App() {
     return date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
   };
 
-  const fetchStats = async (clientId: string) => {
+  const fetchStats = async (id: string) => {
     try {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`${API_BASE_URL}/api/stats/${clientId}`);
+      const response = await fetch(`${API_BASE_URL}/api/stats/${id}`);
 
       if (!response.ok) {
         if (response.status === 404) {
@@ -42,6 +43,11 @@ function App() {
       setStats(data);
       setLoading(false);
       setShowIntro(true);
+
+      // Update URL without refreshing the page
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.set("clientId", id);
+      window.history.pushState({}, "", newUrl);
     } catch (err) {
       console.error("Error fetching stats:", err);
       setError("Failed to fetch stats. Please try again later.");
@@ -52,15 +58,15 @@ function App() {
   useEffect(() => {
     // Get clientId from URL parameters
     const params = new URLSearchParams(window.location.search);
-    const clientId = params.get("clientId");
+    const id = params.get("clientId");
 
-    if (!clientId) {
-      setError("No client ID provided. Click below to see an example!");
+    if (!id) {
+      setError("Enter your client ID below or check out an example!");
       setLoading(false);
       return;
     }
 
-    fetchStats(clientId);
+    fetchStats(id);
   }, []);
 
   const handleIntroComplete = () => {
@@ -68,12 +74,14 @@ function App() {
   };
 
   const handleViewDavidsData = () => {
-    // Update URL without refreshing the page
-    const newUrl = new URL(window.location.href);
-    newUrl.searchParams.set("clientId", "100003434");
-    window.history.pushState({}, "", newUrl);
-
     fetchStats("100003434");
+  };
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    if (clientId.trim()) {
+      fetchStats(clientId.trim());
+    }
   };
 
   if (loading) {
@@ -84,6 +92,19 @@ function App() {
     return (
       <div className="error-container">
         <div className="error">{error}</div>
+        <form onSubmit={handleSubmit} className="client-id-form">
+          <input
+            type="text"
+            value={clientId}
+            onChange={(e) => setClientId(e.target.value)}
+            placeholder="Enter your client ID"
+            className="client-id-input"
+          />
+          <button type="submit" className="view-example-btn">
+            View My Stats
+          </button>
+        </form>
+        <div className="divider">or</div>
         <button onClick={handleViewDavidsData} className="view-example-btn">
           See David's Year in Review
         </button>
