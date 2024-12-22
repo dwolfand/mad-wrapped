@@ -6,21 +6,25 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 2rem;
+  padding: 1rem;
   position: relative;
   touch-action: pan-y pinch-zoom;
   perspective: 1000px;
+  min-height: 400px;
 }
 
 .slide-container {
   width: 100%;
+  min-width: 280px;
   cursor: pointer;
   border-radius: 20px;
-  padding: 2rem;
+  padding: 1.5rem;
   background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(10px);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   transition: box-shadow 0.3s ease;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }
 
 .slide-container:hover {
@@ -31,6 +35,11 @@
   text-align: center;
   width: 100%;
   cursor: grab;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .slide:active {
@@ -139,30 +148,48 @@
 }
 
 @media (max-width: 480px) {
+  .slideshow {
+    padding: 0.5rem;
+    min-height: 350px;
+  }
+
+  .slide-container {
+    padding: 1rem;
+    min-width: 260px;
+  }
+
+  .slide {
+    min-height: 250px;
+  }
+
   .monthly-chart {
     height: 150px;
     padding: 0.5rem;
     margin: 1rem 0;
     gap: 2px;
-    transform: scale(0.85);
+    transform: scale(0.9);
     transform-origin: center center;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .month-bar {
-    min-width: 16px;
+    min-width: 20px;
+    flex: 0 0 auto;
   }
 
   .bar {
-    max-width: 16px;
+    max-width: 20px;
   }
 
   .month-label {
-    font-size: 0.65rem;
+    font-size: 0.7rem;
     height: 24px;
   }
 
   .count-label {
-    font-size: 0.65rem;
+    font-size: 0.7rem;
   }
 
   .slide h2 {
@@ -170,14 +197,16 @@
     margin-bottom: 1rem;
   }
 
-  /* Time Patterns mobile styles */
   .time-patterns {
-    gap: 1rem;
+    gap: 0.75rem;
     margin: 1rem 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    width: 100%;
   }
 
   .highlight {
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     margin-bottom: 0.25rem;
   }
 
@@ -185,39 +214,33 @@
     font-size: 0.8rem;
   }
 
-  /* Adjust other stats for mobile */
   .stat-number {
-    font-size: 3.5rem;
+    font-size: 3rem;
     margin: 1rem 0;
   }
 
   .stat-text {
-    font-size: 2.5rem;
+    font-size: 2rem;
     margin: 1rem 0;
+    word-break: break-word;
   }
 
-  .slide-container {
-    padding: 0.75rem;
-  }
-
-  /* Booking Stats mobile styles */
   .booking-stats {
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 1rem;
     margin: 1rem 0;
-    padding: 0.75rem;
+    padding: 0.5rem;
   }
 
   .booking-stats .stat-circle {
-    width: 52px;
-    height: 52px;
-    font-size: 1.3rem;
-    margin: 0 auto 0.25rem;
-    box-shadow: 0 0 15px rgba(6, 199, 166, 0.15);
+    width: 80px;
+    height: 80px;
+    font-size: 1.5rem;
+    margin: 0 auto 0.5rem;
   }
 
   .booking-stats .booking-item p {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
   }
 }
 
