@@ -5,7 +5,29 @@ export interface MonthlyCount {
 
 export interface LocationStats {
   name: string;
+  count: number;
   percentage: number;
+}
+
+export interface ClassmateStats {
+  firstName: string;
+  lastName: string;
+  sharedClasses: number;
+}
+
+export interface PeerStats {
+  averageClassesPerMonth: number;
+  averageEarlyBirdScore: number;
+  averageLateBookings: number;
+  averageCancellations: number;
+  topClassmates: ClassmateStats[];
+  percentiles: {
+    totalClasses: number;
+    earlyBirdScore: number;
+    classesPerMonth: number;
+    lateBookings: number;
+    cancellations: number;
+  };
 }
 
 export interface WorkoutStats {
@@ -26,4 +48,6 @@ export interface WorkoutStats {
   topThreeTimeSlots: string[];
   classesPerMonth: MonthlyCount[];
   favoriteLocation: LocationStats;
+  locationBreakdown: LocationStats[];
+  peerComparison: PeerStats;
 }

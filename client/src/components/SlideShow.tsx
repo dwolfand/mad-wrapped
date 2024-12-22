@@ -74,6 +74,23 @@ const SlideShow = ({ stats }: SlideShowProps) => {
       ),
     },
     {
+      id: "workout-buddies",
+      content: (
+        <>
+          <h2>Your Workout Buddies</h2>
+          <div className="workout-buddies">
+            {stats.peerComparison.topClassmates.map((buddy, index) => (
+              <div key={index} className="buddy-item">
+                <div className="buddy-name">{buddy.firstName}</div>
+                <div className="shared-classes">{buddy.sharedClasses}</div>
+                <p>Classes Together</p>
+              </div>
+            ))}
+          </div>
+        </>
+      ),
+    },
+    {
       id: "time-patterns",
       content: (
         <>
@@ -110,11 +127,46 @@ const SlideShow = ({ stats }: SlideShowProps) => {
       content: (
         <>
           <h2>Your MAD Home</h2>
-          <div className="stat-text">{stats.favoriteLocation.name}</div>
+          <div className="stat-text">
+            {stats.favoriteLocation.name.replace("MADabolic ", "")}
+          </div>
           <p>{stats.favoriteLocation.percentage}% of your classes were here</p>
         </>
       ),
     },
+    ...(stats.locationBreakdown?.length > 1
+      ? [
+          {
+            id: "other-locations",
+            content: (
+              <>
+                <h2>Your MAD Adventures</h2>
+                <div className="other-locations">
+                  {stats.locationBreakdown
+                    .filter(
+                      (location) =>
+                        location.name !== stats.favoriteLocation.name
+                    )
+                    .map((location, index) => (
+                      <div key={index} className="location-item">
+                        <div className="location-name">
+                          {location.name.replace("MADabolic ", "")}
+                        </div>
+                        <div className="location-percentage">
+                          {location.count}
+                        </div>
+                        <p>Classes</p>
+                        <div className="location-percentage-small">
+                          {location.percentage}% of total
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </>
+            ),
+          },
+        ]
+      : []),
     {
       id: "monthly-progress",
       content: (
@@ -133,6 +185,37 @@ const SlideShow = ({ stats }: SlideShowProps) => {
                 <span className="count-label">{month.count}</span>
               </div>
             ))}
+          </div>
+        </>
+      ),
+    },
+    {
+      id: "member-comparison",
+      content: (
+        <>
+          <h2>How You Stack Up</h2>
+          <div className="percentile-grid">
+            <div className="percentile-item">
+              <div className="percentile-label">Total Classes</div>
+              <div className="percentile-value">
+                Top {100 - stats.peerComparison.percentiles.totalClasses}%
+              </div>
+              <div className="percentile-context">of all members</div>
+            </div>
+            <div className="percentile-item">
+              <div className="percentile-label">Early Bird Score</div>
+              <div className="percentile-value">
+                Top {100 - stats.peerComparison.percentiles.earlyBirdScore}%
+              </div>
+              <div className="percentile-context">rise and grind!</div>
+            </div>
+            <div className="percentile-item">
+              <div className="percentile-label">Monthly Consistency</div>
+              <div className="percentile-value">
+                Top {100 - stats.peerComparison.percentiles.classesPerMonth}%
+              </div>
+              <div className="percentile-context">in classes per month</div>
+            </div>
           </div>
         </>
       ),
