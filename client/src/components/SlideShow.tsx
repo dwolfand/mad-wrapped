@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
-import { WorkoutStats } from "../types";
+import { WorkoutStats, ClassmateStats, LocationStats } from "../types/stats";
 import "./SlideShow.css";
 
 interface SlideShowProps {
@@ -79,13 +79,15 @@ const SlideShow = ({ stats }: SlideShowProps) => {
         <>
           <h2>Your Workout Buddies</h2>
           <div className="workout-buddies">
-            {stats.peerComparison.topClassmates.map((buddy, index) => (
-              <div key={index} className="buddy-item">
-                <div className="buddy-name">{buddy.firstName}</div>
-                <div className="shared-classes">{buddy.sharedClasses}</div>
-                <p>Classes Together</p>
-              </div>
-            ))}
+            {stats.peerComparison.topClassmates.map(
+              (buddy: ClassmateStats, index: number) => (
+                <div key={index} className="buddy-item">
+                  <div className="buddy-name">{buddy.firstName}</div>
+                  <div className="shared-classes">{buddy.sharedClasses}</div>
+                  <p>Classes Together</p>
+                </div>
+              )
+            )}
           </div>
         </>
       ),
@@ -144,10 +146,10 @@ const SlideShow = ({ stats }: SlideShowProps) => {
                 <div className="other-locations">
                   {stats.locationBreakdown
                     .filter(
-                      (location) =>
+                      (location: LocationStats) =>
                         location.name !== stats.favoriteLocation.name
                     )
-                    .map((location, index) => (
+                    .map((location: LocationStats, index: number) => (
                       <div key={index} className="location-item">
                         <div className="location-name">
                           {location.name.replace("MADabolic ", "")}

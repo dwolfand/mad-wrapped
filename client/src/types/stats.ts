@@ -30,6 +30,16 @@ export interface PeerStats {
   };
 }
 
+export interface GlobalStats {
+  totalMembers: number;
+  totalClasses: number;
+  averageClassesPerMember: number;
+  mostPopularTimeSlot: string;
+  mostPopularDay: string;
+  mostPopularCoach: string;
+  averageEarlyBirdScore: number;
+}
+
 export interface WorkoutStats {
   clientId: string;
   firstName: string;
@@ -50,4 +60,6 @@ export interface WorkoutStats {
   favoriteLocation: LocationStats;
   locationBreakdown: LocationStats[];
   peerComparison: PeerStats;
+  globalStats: GlobalStats;
+  perfectMadWeeks: number;
 }
