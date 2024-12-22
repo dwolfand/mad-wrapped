@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { UserInfo } from "./types";
 import { WorkoutStats } from "./types/stats";
 import SlideShow from "./components/SlideShow";
 import IntroAnimation from "./components/IntroAnimation";
@@ -8,7 +7,7 @@ import "./App.css";
 // API URL based on environment
 const API_BASE_URL = import.meta.env.PROD
   ? "https://api-broken-bird-1053.fly.dev" // Production URL
-  : "http://localhost:3001"; // Development URL
+  : "http://localhost:8080"; // Development URL
 
 function App() {
   const [stats, setStats] = useState<WorkoutStats | null>(null);

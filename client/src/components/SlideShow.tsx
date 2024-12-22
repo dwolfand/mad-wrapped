@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import { WorkoutStats } from "../types";
 import "./SlideShow.css";
@@ -21,18 +21,18 @@ const SlideShow = ({ stats }: SlideShowProps) => {
     });
   };
 
-  const handleKeyDown = (event: KeyboardEvent) => {
+  const handleKeyDown = useCallback((event: KeyboardEvent) => {
     if (event.key === "ArrowLeft") {
       paginate(-1);
     } else if (event.key === "ArrowRight") {
       paginate(1);
     }
-  };
+  }, []);
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [handleKeyDown]);
 
   const handleDragEnd = (
     _event: MouseEvent | TouchEvent | PointerEvent,
