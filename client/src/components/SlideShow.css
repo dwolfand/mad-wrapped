@@ -15,7 +15,7 @@
 
 .slide-container {
   width: 100%;
-  min-width: 280px;
+  min-width: 310px;
   cursor: pointer;
   border-radius: 20px;
   padding: 1.5rem;
@@ -155,7 +155,7 @@
 
   .slide-container {
     padding: 1rem;
-    min-width: 260px;
+    min-width: 310px;
   }
 
   .slide {
