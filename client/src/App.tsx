@@ -17,6 +17,15 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [clientId, setClientId] = useState("");
 
+  // Helper function to clean client ID
+  const cleanClientId = (id: string) => {
+    // First decode the URI component
+    const decodedId = decodeURIComponent(id);
+    // Then remove any non-numeric characters
+    const cleanedId = decodedId.replace(/[^0-9]/g, "");
+    return cleanedId;
+  };
+
   // Helper function to format the date
   const formatMemberSince = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -28,7 +37,8 @@ function App() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`${API_BASE_URL}/api/stats/${id}`);
+      const cleanedId = cleanClientId(id);
+      const response = await fetch(`${API_BASE_URL}/api/stats/${cleanedId}`);
 
       if (!response.ok) {
         if (response.status === 404) {
@@ -46,12 +56,12 @@ function App() {
       setShowIntro(true);
 
       // Set analytics user properties and track view
-      setUserProperties(id);
-      trackView(id);
+      setUserProperties(cleanedId);
+      trackView(cleanedId);
 
       // Update URL without refreshing the page
       const newUrl = new URL(window.location.href);
-      newUrl.searchParams.set("clientId", id);
+      newUrl.searchParams.set("clientId", cleanedId);
       window.history.pushState({}, "", newUrl);
     } catch (err) {
       console.error("Error fetching stats:", err);
