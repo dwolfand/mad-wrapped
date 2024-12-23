@@ -45,7 +45,12 @@ const IntroAnimation = ({ userInfo, onComplete }: IntroAnimationProps) => {
           transition={{ delay: 1.8 }}
         >
           <h2>{userInfo.name}</h2>
-          <p>Member since {userInfo.memberSince}</p>
+          <p>
+            Member since{" "}
+            {userInfo.memberSince === "Invalid Date"
+              ? "[a long time ago]"
+              : userInfo.memberSince}
+          </p>
         </motion.div>
 
         <motion.div
