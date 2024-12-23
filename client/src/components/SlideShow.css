@@ -82,7 +82,10 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
-  margin: 2rem 0;
+  margin: 2rem auto;
+  width: 100%;
+  max-width: 100%;
+  padding: 0 1rem;
 }
 
 .pattern-item {
@@ -202,10 +205,8 @@
 
   .time-patterns {
     gap: 0.75rem;
-    margin: 1rem 0;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    width: 100%;
+    margin: 1rem auto;
+    padding: 0;
   }
 
   .highlight {
@@ -539,29 +540,30 @@
 }
 
 .mad-logo {
-  height: 30px;
+  height: 24px;
   margin-bottom: 0.75rem;
 }
 
 .year-title {
-  font-size: 1rem;
+  font-size: 1.2rem;
   color: var(--text-primary);
   margin: 0;
   font-weight: 600;
   text-align: center;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.2em;
   font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 @media (max-width: 480px) {
   .mad-logo {
-    height: 24px;
+    height: 20px;
     margin-bottom: 0.5rem;
   }
 
   .year-title {
-    font-size: 0.85rem;
+    font-size: 1rem;
+    letter-spacing: 0.15em;
   }
 
   .slide-header {
