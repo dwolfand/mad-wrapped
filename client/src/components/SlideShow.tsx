@@ -244,66 +244,45 @@ const SlideShow = ({ stats }: SlideShowProps) => {
 
   return (
     <div className="slideshow">
-      <motion.div
-        className="slide-container"
-        whileHover={{ scale: 1.02 }}
-        transition={{ type: "spring", stiffness: 400, damping: 25 }}
-        onClick={() => paginate(1)}
-      >
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentSlide}
-            className="slide"
-            initial={{ opacity: 0, x: 50 * dragDirection }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 * dragDirection }}
-            transition={{
-              type: "spring",
-              stiffness: 300,
-              damping: 30,
-            }}
-            drag="x"
-            dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0}
-            onDrag={handleDrag}
-            onDragEnd={handleDragEnd}
-            whileTap={{ cursor: "grabbing" }}
-          >
-            {slides[currentSlide].content}
-          </motion.div>
-        </AnimatePresence>
-      </motion.div>
-
-      <motion.div
-        className="progress-dots"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-      >
+      <div className="slide-header">
+        <img src="/mad_logo.svg" alt="MAD Logo" className="mad-logo" />
+        <h1 className="year-title">{stats.firstName}'s 2024 Year in Review</h1>
+      </div>
+      <AnimatePresence initial={false} mode="wait">
+        <motion.div
+          key={currentSlide}
+          className="slide-container"
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={1}
+          onDragEnd={handleDragEnd}
+          onDrag={handleDrag}
+          initial={{
+            x: dragDirection > 0 ? 1000 : -1000,
+            opacity: 0,
+          }}
+          animate={{ x: 0, opacity: 1 }}
+          exit={{
+            x: dragDirection > 0 ? -1000 : 1000,
+            opacity: 0,
+          }}
+          transition={{
+            x: { type: "spring", stiffness: 300, damping: 30 },
+            opacity: { duration: 0.2 },
+          }}
+        >
+          <div className="slide">{slides[currentSlide].content}</div>
+        </motion.div>
+      </AnimatePresence>
+      <div className="progress-dots">
         {slides.map((_, index) => (
-          <motion.div
+          <div
             key={index}
-            className={`dot ${index === currentSlide ? "active" : ""}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              setCurrentSlide(index);
-            }}
-            whileHover={{ scale: 1.5 }}
-            whileTap={{ scale: 0.9 }}
-            animate={
-              index === currentSlide
-                ? {
-                    scale: [1, 1.2, 1],
-                    transition: {
-                      duration: 0.5,
-                      ease: "easeInOut",
-                    },
-                  }
-                : {}
-            }
+            className={`dot ${currentSlide === index ? "active" : ""}`}
+            onClick={() => setCurrentSlide(index)}
           />
         ))}
-      </motion.div>
+      </div>
     </div>
   );
 };
