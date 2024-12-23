@@ -2,6 +2,7 @@ import { useState, useEffect, FormEvent } from "react";
 import { WorkoutStats } from "./types/stats";
 import SlideShow from "./components/SlideShow";
 import IntroAnimation from "./components/IntroAnimation";
+import { setUserProperties, trackView } from "./utils/analytics";
 import "./App.css";
 
 // API URL based on environment
@@ -43,6 +44,10 @@ function App() {
       setStats(data);
       setLoading(false);
       setShowIntro(true);
+
+      // Set analytics user properties and track view
+      setUserProperties(id);
+      trackView(id);
 
       // Update URL without refreshing the page
       const newUrl = new URL(window.location.href);
