@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'Bank Gothic';
+  src: url('/bank_gothic_medium-webfont.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 .slideshow {
   width: 100%;
   max-width: 800px;
@@ -48,13 +56,13 @@
 }
 
 .slide h2 {
-  font-size: 2rem;
+  font-size: 1.6rem;
   margin-bottom: 2rem;
   color: var(--text-primary);
-  background: linear-gradient(45deg, var(--mad-dark-green), var(--mad-light-green));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-family: "Bank Gothic", "BankGothic Lt BT", "Bank Sans", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .stat-number {
@@ -199,8 +207,9 @@
   }
 
   .slide h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.08em;
   }
 
   .time-patterns {
@@ -245,6 +254,12 @@
 
   .booking-stats .booking-item p {
     font-size: 0.9rem;
+  }
+
+  .slide h2 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.08em;
   }
 }
 
@@ -502,30 +517,33 @@
   font-size: 0.9rem;
   color: var(--text-secondary);
   font-weight: 600;
+  font-family: "Bank Gothic", "BankGothic Lt BT", "Bank Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: 0.05em;
 }
 
 @media (max-width: 480px) {
   .percentile-grid {
     grid-template-columns: 1fr;
-    gap: 10px;
-    margin-top: 15px;
+    gap: 8px;
+    margin-top: 10px;
   }
 
   .percentile-item {
-    padding: 12px;
+    padding: 8px;
   }
 
   .percentile-label {
-    font-size: 1rem;
-    margin-bottom: 5px;
+    font-size: 0.9rem;
+    margin-bottom: 2px;
   }
 
   .percentile-value {
-    font-size: 1.6rem;
+    font-size: 1.4rem;
+    margin: 2px 0;
   }
 
   .percentile-context {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
   }
 }
 
@@ -548,11 +566,11 @@
   font-size: 1.2rem;
   color: var(--text-primary);
   margin: 0;
-  font-weight: 600;
+  font-weight: bold;
   text-align: center;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: 0.2em;
+  font-family: "Rubik", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 @media (max-width: 480px) {
@@ -563,10 +581,36 @@
 
   .year-title {
     font-size: 1rem;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
   }
 
   .slide-header {
     margin-bottom: 2.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .booking-stats {
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 0.5rem 0;
+    padding: 0;
+  }
+
+  .booking-stats .stat-circle {
+    width: 80px;
+    height: 80px;
+    font-size: 1.5rem;
+    margin: 0 auto 0.25rem;
+  }
+
+  .booking-stats .booking-item p {
+    font-size: 0.9rem;
+  }
+
+  .slide h2 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.08em;
   }
 } 
