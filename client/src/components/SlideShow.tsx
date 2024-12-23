@@ -152,7 +152,9 @@ const SlideShow = ({ stats }: SlideShowProps) => {
                     .map((location: LocationStats, index: number) => (
                       <div key={index} className="location-item">
                         <div className="location-name">
-                          {location.name.replace("MADabolic ", "")}
+                          {location.name
+                            .replace("MADabolic ", "")
+                            .replace("Madabolic ", "")}
                         </div>
                         <div className="location-percentage">
                           {location.count}
