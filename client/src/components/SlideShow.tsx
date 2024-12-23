@@ -59,7 +59,7 @@ const SlideShow = ({ stats }: SlideShowProps) => {
         <>
           <h2>Your MAD Year in Numbers</h2>
           <div className="stat-number">{stats.totalClasses}</div>
-          <p>Total Classes Crushed</p>
+          <p>Total classes crushed</p>
         </>
       ),
     },
@@ -84,7 +84,7 @@ const SlideShow = ({ stats }: SlideShowProps) => {
                 <div key={index} className="buddy-item">
                   <div className="buddy-name">{buddy.firstName}</div>
                   <div className="shared-classes">{buddy.sharedClasses}</div>
-                  <p>Classes Together</p>
+                  <p>Classes together</p>
                 </div>
               )
             )}
@@ -100,15 +100,15 @@ const SlideShow = ({ stats }: SlideShowProps) => {
           <div className="time-patterns">
             <div className="pattern-item">
               <span className="highlight">{stats.favoriteTimeOfDay}</span>
-              <p>Favorite Time</p>
+              <p>Favorite time</p>
             </div>
             <div className="pattern-item">
               <span className="highlight">{stats.mostFrequentDay}</span>
-              <p>Most Frequent Day</p>
+              <p>Most frequent day</p>
             </div>
             <div className="pattern-item">
               <span className="highlight">{stats.earlyBirdScore}%</span>
-              <p>Early Bird Score</p>
+              <p>Early bird score</p>
             </div>
           </div>
         </>
@@ -118,9 +118,9 @@ const SlideShow = ({ stats }: SlideShowProps) => {
       id: "streak",
       content: (
         <>
-          <h2>Consistency is Key!</h2>
+          <h2>Consistency is Key</h2>
           <div className="stat-number">{stats.longestStreak}</div>
-          <p>Longest Streak of Classes</p>
+          <p>Longest streak of classes</p>
         </>
       ),
     },
@@ -202,21 +202,21 @@ const SlideShow = ({ stats }: SlideShowProps) => {
               <div className="percentile-value">
                 Top {100 - stats.peerComparison.percentiles.totalClasses}%
               </div>
-              <div className="percentile-context">of all members</div>
+              <div className="percentile-context">Of all members</div>
             </div>
             <div className="percentile-item">
               <div className="percentile-label">Early Bird Score</div>
               <div className="percentile-value">
                 Top {100 - stats.peerComparison.percentiles.earlyBirdScore}%
               </div>
-              <div className="percentile-context">rise and grind!</div>
+              <div className="percentile-context">Rise and grind!</div>
             </div>
             <div className="percentile-item">
               <div className="percentile-label">Monthly Consistency</div>
               <div className="percentile-value">
                 Top {100 - stats.peerComparison.percentiles.classesPerMonth}%
               </div>
-              <div className="percentile-context">in classes per month</div>
+              <div className="percentile-context">In classes per month</div>
             </div>
           </div>
         </>
@@ -230,7 +230,7 @@ const SlideShow = ({ stats }: SlideShowProps) => {
           <div className="booking-stats">
             <div className="booking-item">
               <span className="stat-circle">{stats.totalLateBookings}</span>
-              <p>Last-Minute Bookings</p>
+              <p>Last-minute bookings</p>
             </div>
             <div className="booking-item">
               <span className="stat-circle">{stats.totalCancellations}</span>
