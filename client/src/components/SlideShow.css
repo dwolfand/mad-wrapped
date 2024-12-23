@@ -62,7 +62,7 @@
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  font-family: "Bank Gothic", "BankGothic Lt BT", "Bank Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: "Rubik", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .stat-number {
@@ -517,8 +517,6 @@
   font-size: 0.9rem;
   color: var(--text-secondary);
   font-weight: 600;
-  font-family: "Bank Gothic", "BankGothic Lt BT", "Bank Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-  letter-spacing: 0.05em;
 }
 
 @media (max-width: 480px) {
@@ -570,7 +568,7 @@
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 0.2em;
-  font-family: "Rubik", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: "Bank Gothic", "BankGothic Lt BT", "Bank Sans", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 @media (max-width: 480px) {
