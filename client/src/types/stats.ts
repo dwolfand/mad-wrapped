@@ -27,6 +27,7 @@ export interface PeerStats {
     classesPerMonth: number;
     lateBookings: number;
     cancellations: number;
+    perfectWeeks: number;
   };
 }
 
@@ -62,4 +63,8 @@ export interface WorkoutStats {
   peerComparison: PeerStats;
   globalStats: GlobalStats;
   perfectMadWeeks: number;
+  durabilityClasses: number;
+  anaerobicClasses: number;
+  momentumClasses: number;
+  deloadClasses: number;
 }

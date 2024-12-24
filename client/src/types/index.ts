@@ -1,6 +1,6 @@
 export interface UserInfo {
   name: string;
-  memberSince: string;
+  memberSince: string | null;
   avatar?: string;
 }
 

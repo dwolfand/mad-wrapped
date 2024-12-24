@@ -47,7 +47,7 @@ const IntroAnimation = ({ userInfo, onComplete }: IntroAnimationProps) => {
           <h2>{userInfo.name}</h2>
           <p>
             Member since{" "}
-            {userInfo.memberSince === "Invalid Date"
+            {userInfo.memberSince === "Invalid Date" || !userInfo.memberSince
               ? "[a long time ago]"
               : userInfo.memberSince}
           </p>

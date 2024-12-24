@@ -9,10 +9,13 @@ import "./App.css";
 // API URL based on environment
 const API_BASE_URL = import.meta.env.PROD
   ? "https://api-broken-bird-1053.fly.dev" // Production URL
-  : "http://localhost:8080"; // Development URL
+  : "http://localhost:3005"; // Development URL
 
 // Helper function to format the date
-const formatMemberSince = (dateStr: string) => {
+const formatMemberSince = (dateStr: string | null) => {
+  if (!dateStr) {
+    return null;
+  }
   const date = new Date(dateStr);
   return date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
 };
@@ -32,6 +35,14 @@ function App() {
     return cleanedId;
   };
 
+  // Helper function to validate studio ID
+  const validateStudioId = (id: string): string => {
+    const decodedId = decodeURIComponent(id);
+    return STUDIOS.some((studio) => studio.id === decodedId)
+      ? decodedId
+      : DUPONT_ID;
+  };
+
   // Load initial values from URL
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -40,8 +51,9 @@ function App() {
 
     if (urlClientId) {
       setClientId(urlClientId);
-      setStudioId(urlStudioId || DUPONT_ID);
-      fetchStats(urlClientId, urlStudioId || DUPONT_ID);
+      const validatedStudioId = validateStudioId(urlStudioId || DUPONT_ID);
+      setStudioId(validatedStudioId);
+      fetchStats(urlClientId, validatedStudioId);
     }
   }, []);
 
@@ -51,8 +63,9 @@ function App() {
       setError(null);
 
       const cleanedId = cleanClientId(id);
+      const validatedStudioId = validateStudioId(studio);
       const response = await fetch(
-        `${API_BASE_URL}/api/stats/${cleanedId}/${studio}`
+        `${API_BASE_URL}/api/stats/${cleanedId}/${validatedStudioId}`
       );
 
       if (!response.ok) {
@@ -77,7 +90,7 @@ function App() {
       // Update URL without refreshing the page
       const newUrl = new URL(window.location.href);
       newUrl.searchParams.set("clientId", cleanedId);
-      newUrl.searchParams.set("studioId", studio);
+      newUrl.searchParams.set("studioId", validatedStudioId);
       window.history.pushState({}, "", newUrl);
     } catch (err) {
       console.error("Error fetching stats:", err);
@@ -148,7 +161,7 @@ function App() {
         <IntroAnimation
           userInfo={{
             name: stats.firstName,
-            memberSince: formatMemberSince(stats.firstSeen),
+            memberSince: formatMemberSince(stats.firstSeen || null),
           }}
           onComplete={handleIntroComplete}
         />

@@ -1,10 +1,20 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
-import { WorkoutStats, ClassmateStats, LocationStats } from "../types/stats";
+import {
+  WorkoutStats,
+  ClassmateStats,
+  LocationStats,
+  PeerStats,
+} from "../types/stats";
 import "./SlideShow.css";
+import { Pie } from "react-chartjs-2";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 interface SlideShowProps {
   stats: WorkoutStats;
+  peerStats: PeerStats;
 }
 
 const SlideShow = ({ stats }: SlideShowProps) => {
@@ -99,7 +109,9 @@ const SlideShow = ({ stats }: SlideShowProps) => {
           <h2>Your Workout Schedule</h2>
           <div className="time-patterns">
             <div className="pattern-item">
-              <span className="highlight">{stats.favoriteTimeOfDay}</span>
+              <span className="highlight">
+                {stats.favoriteTimeOfDay.replace(/^0/, "")}
+              </span>
               <p>Favorite time</p>
             </div>
             <div className="pattern-item">
@@ -118,9 +130,98 @@ const SlideShow = ({ stats }: SlideShowProps) => {
       id: "streak",
       content: (
         <>
-          <h2>Consistency is Key</h2>
-          <div className="stat-number">{stats.longestStreak}</div>
-          <p>Longest streak of classes</p>
+          <h2>Perfect MAD Weeks</h2>
+          <div className="stat-number">{stats.perfectMadWeeks}</div>
+          <p>Weeks with 4+ classes</p>
+        </>
+      ),
+    },
+    {
+      id: "class-types",
+      content: (
+        <>
+          <h2>Your MAD Mix</h2>
+          <div className="pie-chart-container">
+            <Pie
+              data={{
+                labels: ["Durability", "Anaerobic", "Momentum"],
+                datasets: [
+                  {
+                    data: [
+                      stats.durabilityClasses,
+                      stats.anaerobicClasses,
+                      stats.momentumClasses,
+                    ],
+                    backgroundColor: ["#06C7A6", "#616161", "#ffffff"],
+                    borderColor: [
+                      "rgba(0, 0, 0, 0.2)",
+                      "rgba(0, 0, 0, 0.2)",
+                      "rgba(0, 0, 0, 0.4)",
+                    ],
+                    borderWidth: 1,
+                  },
+                ],
+              }}
+              options={{
+                plugins: {
+                  legend: {
+                    display: false,
+                  },
+                  tooltip: {
+                    enabled: true,
+                    backgroundColor: "rgba(0, 0, 0, 0.8)",
+                    titleColor: "#fff",
+                    bodyColor: "#fff",
+                    padding: 12,
+                    displayColors: false,
+                    callbacks: {
+                      label: function (context) {
+                        const total = context.dataset.data.reduce(
+                          (a: number, b: number) => a + b,
+                          0
+                        );
+                        const value = context.raw as number;
+                        const percentage = ((value / total) * 100).toFixed(1);
+                        return `${value} classes (${percentage}%)`;
+                      },
+                    },
+                  },
+                },
+                responsive: true,
+                maintainAspectRatio: true,
+                layout: {
+                  padding: {
+                    top: 10,
+                    bottom: 10,
+                  },
+                },
+              }}
+            />
+          </div>
+          <p className="stat-detail">
+            You crushed{" "}
+            <span className="durability-text">
+              {stats.durabilityClasses} Durability
+            </span>
+            ,{" "}
+            <span className="anaerobic-text">
+              {stats.anaerobicClasses} Anaerobic
+            </span>
+            ,{" "}
+            <span className="momentum-text">
+              {stats.momentumClasses} Momentum
+            </span>
+            {stats.deloadClasses > 0 && (
+              <>
+                {" "}
+                and{" "}
+                <span className="deload-text">
+                  {stats.deloadClasses} De-Load
+                </span>
+              </>
+            )}
+            classes!
+          </p>
         </>
       ),
     },
@@ -202,21 +303,33 @@ const SlideShow = ({ stats }: SlideShowProps) => {
             <div className="percentile-item">
               <div className="percentile-label">Total Classes</div>
               <div className="percentile-value">
-                Top {100 - stats.peerComparison.percentiles.totalClasses}%
+                {100 - stats.peerComparison.percentiles.totalClasses <= 1
+                  ? "Top 1% 🏆"
+                  : `Top ${
+                      100 - stats.peerComparison.percentiles.totalClasses
+                    }%`}
               </div>
               <div className="percentile-context">Of all members</div>
             </div>
             <div className="percentile-item">
-              <div className="percentile-label">Early Bird Score</div>
+              <div className="percentile-label">Perfect Weeks</div>
               <div className="percentile-value">
-                Top {100 - stats.peerComparison.percentiles.earlyBirdScore}%
+                {100 - stats.peerComparison.percentiles.perfectWeeks <= 1
+                  ? "Top 1% 🏆"
+                  : `Top ${
+                      100 - stats.peerComparison.percentiles.perfectWeeks
+                    }%`}
               </div>
-              <div className="percentile-context">Rise and grind!</div>
+              <div className="percentile-context">In perfect weeks</div>
             </div>
             <div className="percentile-item">
               <div className="percentile-label">Monthly Consistency</div>
               <div className="percentile-value">
-                Top {100 - stats.peerComparison.percentiles.classesPerMonth}%
+                {100 - stats.peerComparison.percentiles.classesPerMonth <= 1
+                  ? "Top 1% 🏆"
+                  : `Top ${
+                      100 - stats.peerComparison.percentiles.classesPerMonth
+                    }%`}
               </div>
               <div className="percentile-context">In classes per month</div>
             </div>
