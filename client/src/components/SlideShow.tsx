@@ -14,7 +14,7 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 interface SlideShowProps {
   stats: WorkoutStats;
-  peerStats: PeerStats;
+  peerStats?: PeerStats;
 }
 
 const SlideShow = ({ stats }: SlideShowProps) => {
