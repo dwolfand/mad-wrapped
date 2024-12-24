@@ -120,15 +120,15 @@ const SlideShow = ({ stats }: SlideShowProps) => {
               <div className="percentile-context">In perfect weeks</div>
             </div>
             <div className="percentile-item">
-              <div className="percentile-label">Monthly Consistency</div>
+              <div className="percentile-label">Early Bird Status</div>
               <div className="percentile-value">
-                {100 - stats.peerComparison.percentiles.classesPerMonth <= 1
+                {100 - stats.peerComparison.percentiles.earlyBirdScore <= 1
                   ? "Top 1% 🏆"
                   : `Top ${
-                      100 - stats.peerComparison.percentiles.classesPerMonth
+                      100 - stats.peerComparison.percentiles.earlyBirdScore
                     }%`}
               </div>
-              <div className="percentile-context">In classes per month</div>
+              <div className="percentile-context">Of early risers</div>
             </div>
           </div>
         </>
@@ -256,7 +256,7 @@ const SlideShow = ({ stats }: SlideShowProps) => {
             </div>
             <div className="pattern-item">
               <span className="highlight">{stats.earlyBirdScore}%</span>
-              <p>Early bird score</p>
+              <p>Classes before 8am</p>
             </div>
           </div>
         </>
