@@ -21,24 +21,8 @@ interface SlideShowProps {
 const SlideShow = ({ stats }: SlideShowProps) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [dragDirection, setDragDirection] = useState<number>(0);
-  const [slideSize, setSlideSize] = useState({ width: 0, height: 0 });
   const slideRef = useRef<HTMLDivElement>(null);
   const swipeConfidenceThreshold = 50;
-
-  useEffect(() => {
-    const updateSize = () => {
-      if (slideRef.current) {
-        setSlideSize({
-          width: slideRef.current.offsetWidth,
-          height: slideRef.current.offsetHeight,
-        });
-      }
-    };
-
-    updateSize();
-    window.addEventListener("resize", updateSize);
-    return () => window.removeEventListener("resize", updateSize);
-  }, []);
 
   const paginate = (direction: number) => {
     setCurrentSlide((prev) => {
