@@ -295,7 +295,14 @@ const SlideShow = ({ stats }: SlideShowProps) => {
       content: (
         <>
           <h2>Your Favorite Coach</h2>
-          <div className="stat-text">{stats.topCoach}</div>
+          <div className="stat-text">
+            {stats.topCoach
+              .split(" ")
+              .map((part, index, array) =>
+                index === array.length - 1 ? `${part[0]}.` : part
+              )
+              .join(" ")}
+          </div>
           <p>Thanks for the motivation!</p>
         </>
       ),
@@ -309,7 +316,9 @@ const SlideShow = ({ stats }: SlideShowProps) => {
             {stats.peerComparison.topClassmates.map(
               (buddy: ClassmateStats, index: number) => (
                 <div key={index} className="buddy-item">
-                  <div className="buddy-name">{buddy.firstName}</div>
+                  <div className="buddy-name">{`${
+                    buddy.firstName
+                  } ${buddy.lastName.slice(0, 1)}.`}</div>
                   <div className="shared-classes">{buddy.sharedClasses}</div>
                   <p>Classes together</p>
                 </div>
