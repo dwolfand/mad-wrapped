@@ -384,7 +384,17 @@ const SlideShow = ({ stats }: SlideShowProps) => {
           <h2>Ready to Crush 2025?</h2>
           <div className="share-section">
             <p className="share-text">Share your MAD journey on Instagram!</p>
-            <p className="tag-text">Tag us @mad_dmv</p>
+            <p className="tag-text">
+              Tag us{" "}
+              <a
+                href="https://www.instagram.com/mad_dmv"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "inherit", textDecoration: "none" }}
+              >
+                @mad_dmv
+              </a>
+            </p>
             <div className="motivation-text">
               Let's see how you'll stack up next year! 💪
             </div>
