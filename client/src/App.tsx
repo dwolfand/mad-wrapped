@@ -9,7 +9,7 @@ import "./App.css";
 // API URL based on environment
 const API_BASE_URL = import.meta.env.PROD
   ? "https://api-broken-bird-1053.fly.dev" // Production URL
-  : "http://localhost:3005"; // Development URL
+  : "http://localhost:8080"; // Development URL
 
 // Helper function to format the date
 const formatMemberSince = (dateStr: string | null) => {
