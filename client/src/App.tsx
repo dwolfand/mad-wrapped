@@ -1,5 +1,6 @@
-import { useState, useEffect, FormEvent } from "react";
+import { useState, useEffect } from "react";
 import { WorkoutStats } from "./types/stats";
+import { STUDIOS, DUPONT_ID } from "./types/studios";
 import SlideShow from "./components/SlideShow";
 import IntroAnimation from "./components/IntroAnimation";
 import { setUserProperties, trackView } from "./utils/analytics";
@@ -10,39 +11,53 @@ const API_BASE_URL = import.meta.env.PROD
   ? "https://api-broken-bird-1053.fly.dev" // Production URL
   : "http://localhost:8080"; // Development URL
 
+// Helper function to format the date
+const formatMemberSince = (dateStr: string) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+};
+
 function App() {
   const [stats, setStats] = useState<WorkoutStats | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [clientId, setClientId] = useState("");
+  const [studioId, setStudioId] = useState(DUPONT_ID);
 
   // Helper function to clean client ID
   const cleanClientId = (id: string) => {
-    // First decode the URI component
     const decodedId = decodeURIComponent(id);
-    // Then remove any non-numeric characters
     const cleanedId = decodedId.replace(/[^0-9]/g, "");
     return cleanedId;
   };
 
-  // Helper function to format the date
-  const formatMemberSince = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
-  };
+  // Load initial values from URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const urlClientId = params.get("clientId");
+    const urlStudioId = params.get("studioId");
 
-  const fetchStats = async (id: string) => {
+    if (urlClientId) {
+      setClientId(urlClientId);
+      setStudioId(urlStudioId || DUPONT_ID);
+      fetchStats(urlClientId, urlStudioId || DUPONT_ID);
+    }
+  }, []);
+
+  const fetchStats = async (id: string, studio: string) => {
     try {
       setLoading(true);
       setError(null);
 
       const cleanedId = cleanClientId(id);
-      const response = await fetch(`${API_BASE_URL}/api/stats/${cleanedId}`);
+      const response = await fetch(
+        `${API_BASE_URL}/api/stats/${cleanedId}/${studio}`
+      );
 
       if (!response.ok) {
         if (response.status === 404) {
-          setError("Stats not found for this client ID.");
+          setError("Stats not found for this client ID and studio.");
         } else {
           setError("Failed to fetch stats. Please try again later.");
         }
@@ -62,6 +77,7 @@ function App() {
       // Update URL without refreshing the page
       const newUrl = new URL(window.location.href);
       newUrl.searchParams.set("clientId", cleanedId);
+      newUrl.searchParams.set("studioId", studio);
       window.history.pushState({}, "", newUrl);
     } catch (err) {
       console.error("Error fetching stats:", err);
@@ -70,32 +86,18 @@ function App() {
     }
   };
 
-  useEffect(() => {
-    // Get clientId from URL parameters
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get("clientId");
-
-    if (!id) {
-      setError("Enter your client ID below or check out an example!");
-      setLoading(false);
-      return;
-    }
-
-    fetchStats(id);
-  }, []);
-
   const handleIntroComplete = () => {
     setShowIntro(false);
   };
 
   const handleViewDavidsData = () => {
-    fetchStats("100003434");
+    fetchStats("100003434", DUPONT_ID);
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (clientId.trim()) {
-      fetchStats(clientId.trim());
+    if (clientId) {
+      fetchStats(clientId, studioId);
     }
   };
 
@@ -103,10 +105,13 @@ function App() {
     return <div className="loading">Loading your year in review...</div>;
   }
 
-  if (error) {
+  if (error || !stats) {
     return (
       <div className="error-container">
-        <div className="error">{error}</div>
+        <div className="form-title">
+          Enter your client ID below or check out an example!
+        </div>
+        {error && <div className="error">{error}</div>}
         <form onSubmit={handleSubmit} className="client-id-form">
           <input
             type="text"
@@ -115,6 +120,16 @@ function App() {
             placeholder="Enter your client ID"
             className="client-id-input"
           />
+          <select
+            value={studioId}
+            onChange={(e) => setStudioId(e.target.value)}
+          >
+            {STUDIOS.map((studio) => (
+              <option key={studio.id} value={studio.id}>
+                {studio.name}
+              </option>
+            ))}
+          </select>
           <button type="submit" className="view-example-btn">
             View My Stats
           </button>

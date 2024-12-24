@@ -80,18 +80,21 @@ function writeStats(stats: any) {
 }
 
 // Get stats by clientId endpoint
-app.get("/api/stats/:clientId", (req, res) => {
+app.get("/api/stats/:clientId/:studioId", (req, res) => {
   try {
-    const { clientId } = req.params;
+    const { clientId, studioId } = req.params;
     const stats = readStats();
 
-    if (!stats[clientId]) {
+    // Create a composite key using both clientId and studioId
+    const key = `${clientId}-${studioId}`;
+
+    if (!stats[key]) {
       return res
         .status(404)
-        .json({ error: "Stats not found for this client ID" });
+        .json({ error: "Stats not found for this client ID and studio" });
     }
 
-    res.json(stats[clientId]);
+    res.json(stats[key]);
   } catch (error) {
     console.error("Error fetching stats:", error);
     res.status(500).json({ error: "Internal server error" });
