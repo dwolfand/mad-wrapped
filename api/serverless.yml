@@ -12,12 +12,20 @@ provider:
   name: aws
   runtime: nodejs18.x
   region: us-east-1
+  stage: ${opt:stage, 'dev'}
   environment:
     STAGE: ${opt:stage, 'dev'}
-    SENTRY_DSN: ${env:SENTRY_DSN, ''}
     MONGODB_URI: ${env:MONGODB_URI, ''}
     MONGODB_DB_NAME: ${env:MONGODB_DB_NAME, ''}
-    SENDGRID_API_KEY: ${env:SENDGRID_API_KEY, ''}
+    SENTRY_DSN: ${env:SENTRY_DSN, ''}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - ses:SendEmail
+            - ses:SendRawEmail
+          Resource: "*"
 
 package:
   patterns:
@@ -65,9 +73,12 @@ custom:
     srcPath: src
     include:
       - src/**/*.ts
+  basePaths:
+    production: ""
+    dev: "dev"
   customDomain:
     domainName: api.madwrapped.com
-    basePath: ""
+    basePath: ${self:custom.basePaths.${self:provider.stage}}
     stage: ${opt:stage, 'dev'}
     createRoute53Record: true
     endpointType: "regional"

@@ -257,24 +257,6 @@ const SlideShow = ({ stats }: SlideShowProps) => {
       ),
     },
     {
-      id: "booking-habits",
-      content: (
-        <>
-          <h2>Booking Habits</h2>
-          <div className="booking-stats">
-            <div className="booking-item">
-              <span className="stat-circle">{stats.totalLateBookings}</span>
-              <p>Last-minute bookings</p>
-            </div>
-            <div className="booking-item">
-              <span className="stat-circle">{stats.totalCancellations}</span>
-              <p>Cancellations</p>
-            </div>
-          </div>
-        </>
-      ),
-    },
-    {
       id: "favorite-coach",
       content: (
         <>
@@ -360,6 +342,24 @@ const SlideShow = ({ stats }: SlideShowProps) => {
           },
         ]
       : []),
+    {
+      id: "booking-habits",
+      content: (
+        <>
+          <h2>Booking Habits</h2>
+          <div className="booking-stats">
+            <div className="booking-item">
+              <span className="stat-circle">{stats.totalLateBookings}</span>
+              <p>Last-minute bookings</p>
+            </div>
+            <div className="booking-item">
+              <span className="stat-circle">{stats.totalCancellations}</span>
+              <p>Cancellations</p>
+            </div>
+          </div>
+        </>
+      ),
+    },
     {
       id: "final-slide",
       content: (

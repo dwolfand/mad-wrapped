@@ -301,11 +301,6 @@ function App() {
           </form>
         )}
 
-        <div className="divider">or</div>
-        <button onClick={handleViewDavidsData} className="view-example-btn">
-          See David's Year in Review
-        </button>
-
         <button
           onClick={() => setShowAdvanced(!showAdvanced)}
           className="advanced-toggle"
@@ -314,29 +309,35 @@ function App() {
         </button>
 
         {showAdvanced && (
-          <form onSubmit={handleDirectAccess} className="client-id-form">
-            <input
-              type="text"
-              value={clientId}
-              onChange={(e) => setClientId(e.target.value)}
-              placeholder="Enter your client ID"
-              className="client-id-input"
-            />
-            <select
-              value={studioId}
-              onChange={(e) => setStudioId(e.target.value)}
-              className="select"
-            >
-              {STUDIOS.map((studio) => (
-                <option key={studio.id} value={studio.id}>
-                  {studio.name}
-                </option>
-              ))}
-            </select>
-            <button type="submit" className="view-stats-btn">
-              View Stats Directly
+          <>
+            <form onSubmit={handleDirectAccess} className="client-id-form">
+              <input
+                type="text"
+                value={clientId}
+                onChange={(e) => setClientId(e.target.value)}
+                placeholder="Enter your client ID"
+                className="client-id-input"
+              />
+              <select
+                value={studioId}
+                onChange={(e) => setStudioId(e.target.value)}
+                className="select"
+              >
+                {STUDIOS.map((studio) => (
+                  <option key={studio.id} value={studio.id}>
+                    {studio.name}
+                  </option>
+                ))}
+              </select>
+              <button type="submit" className="view-stats-btn">
+                View Stats Directly
+              </button>
+            </form>
+            <div className="divider">or</div>
+            <button onClick={handleViewDavidsData} className="view-example-btn">
+              See Example Year in Review
             </button>
-          </form>
+          </>
         )}
       </div>
     );
