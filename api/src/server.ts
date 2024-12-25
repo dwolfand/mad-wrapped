@@ -3,11 +3,22 @@ import cors from "cors";
 import dotenv from "dotenv";
 import fs from "fs";
 import path from "path";
+import * as Sentry from "@sentry/node";
 
 console.log("Starting server");
 
 // Load environment variables
 dotenv.config();
+
+// Initialize Sentry
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+  environment: process.env.NODE_ENV || "development",
+  // Set tracesSampleRate to 1.0 to capture 100% of transactions
+  tracesSampleRate: 1.0,
+});
+
+Sentry.profiler.startProfiler();
 
 const app = express();
 const port = parseInt(process.env.PORT || "8080", 10);
@@ -83,12 +94,31 @@ function writeStats(stats: any) {
 app.get("/api/stats/:clientId/:studioId", (req, res) => {
   try {
     const { clientId, studioId } = req.params;
+    console.log(
+      `Querying stats for clientId: ${clientId} and studioId: ${studioId}`
+    );
+
+    // Track the query in Sentry
+    Sentry.addBreadcrumb({
+      category: "stats-query",
+      message: "Stats queried",
+      data: {
+        clientId,
+        studioId,
+      },
+      level: "info",
+    });
+
     const stats = readStats();
 
     // Create a composite key using both clientId and studioId
     const key = `${clientId}-${studioId}`;
 
     if (!stats[key]) {
+      Sentry.captureMessage(
+        `Stats not found for client ${clientId} and studio ${studioId}`,
+        "warning"
+      );
       return res
         .status(404)
         .json({ error: "Stats not found for this client ID and studio" });
@@ -97,6 +127,7 @@ app.get("/api/stats/:clientId/:studioId", (req, res) => {
     res.json(stats[key]);
   } catch (error) {
     console.error("Error fetching stats:", error);
+    Sentry.captureException(error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -105,6 +136,8 @@ app.get("/api/stats/:clientId/:studioId", (req, res) => {
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok" });
 });
+
+Sentry.setupExpressErrorHandler(app);
 
 // Start server
 function startServer() {
