@@ -7,7 +7,8 @@
     "build": "tsc",
     "start": "ts-node src/server.ts",
     "dev": "serverless offline",
-    "deploy": "serverless deploy --stage production --aws-profile personal"
+    "deploy": "serverless deploy --stage production --aws-profile personal",
+    "deploy-ci": "serverless deploy --stage production"
   },
   "dependencies": {
     "@aws-sdk/client-ses": "^3.716.0",

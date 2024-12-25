@@ -77,4 +77,4 @@ jobs:
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
           SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-        run: npm run deploy
+        run: npm run deploy-ci
