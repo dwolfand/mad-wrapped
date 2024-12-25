@@ -35,11 +35,17 @@ function App() {
     return cleanedId;
   };
 
+  // Helper function to clean studio ID
+  const cleanStudioId = (id: string) => {
+    const decodedId = decodeURIComponent(id);
+    return decodedId.replace(/[^\w-]/g, ""); // Remove any characters that aren't alphanumeric or hyphens
+  };
+
   // Helper function to validate studio ID
   const validateStudioId = (id: string): string => {
-    const decodedId = decodeURIComponent(id);
-    return STUDIOS.some((studio) => studio.id === decodedId)
-      ? decodedId
+    const cleanedId = cleanStudioId(id);
+    return STUDIOS.some((studio) => studio.id === cleanedId)
+      ? cleanedId
       : DUPONT_ID;
   };
 
