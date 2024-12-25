@@ -38,12 +38,6 @@ export async function getStats(req: Request, res: Response) {
     });
 
     if (!stats) {
-      if (process.env.SENTRY_DSN) {
-        Sentry.captureMessage(
-          `Stats not found for client ${clientId} and studio ${studioId}`,
-          "warning"
-        );
-      }
       // Log the failed attempt
       await logActivity({
         type: "stats_not_found",
