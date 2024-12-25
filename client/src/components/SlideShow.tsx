@@ -341,6 +341,7 @@ const SlideShow = ({ stats }: SlideShowProps) => {
                       <div key={index} className="location-item">
                         <div className="location-name">
                           {location.name
+                            .replace("MADabolic - ", "")
                             .replace("MADabolic ", "")
                             .replace("Madabolic ", "")}
                         </div>
