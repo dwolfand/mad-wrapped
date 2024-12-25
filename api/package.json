@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "start": "ts-node src/server.ts",
-    "dev": "serverless offline",
+    "dev": "AWS_PROFILE=personal serverless offline",
     "deploy": "serverless deploy --stage dev --aws-profile personal",
     "deploy:prod": "serverless deploy --stage production --aws-profile personal",
     "deploy-ci": "serverless deploy --stage production"

@@ -17,7 +17,9 @@ export async function lookupEmail(req: Request, res: Response) {
 
   try {
     const db = await getDb();
-    const stats = await db.collection("workout_stats").findOne({ email });
+    const stats = await db.collection("workout_stats").findOne({
+      email: email.toLowerCase(),
+    });
 
     if (!stats) {
       await logActivity({
@@ -36,7 +38,7 @@ export async function lookupEmail(req: Request, res: Response) {
 
     // Send email with stats link
     await sendStatsLinkEmail({
-      email,
+      email: stats.email,
       firstName: stats.firstName,
       clientId: stats.clientId,
       studioId: stats.studioId,
@@ -99,11 +101,12 @@ export async function requestNotification(req: Request, res: Response) {
 
   try {
     const db = await getDb();
+    const lowerEmail = email.toLowerCase();
 
     // Check if already requested
     const existingRequest = await db
       .collection("notification_requests")
-      .findOne({ email });
+      .findOne({ email: lowerEmail });
     if (existingRequest) {
       return res.json({
         message:
@@ -114,7 +117,7 @@ export async function requestNotification(req: Request, res: Response) {
 
     // Save new request
     await db.collection("notification_requests").insertOne({
-      email,
+      email: lowerEmail,
       firstName,
       lastName,
       studio,
