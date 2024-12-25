@@ -94,6 +94,9 @@ function writeStats(stats: any) {
 app.get("/api/stats/:clientId/:studioId", (req, res) => {
   try {
     const { clientId, studioId } = req.params;
+    // Get IP address, considering forwarded headers for proxy situations
+    const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+
     console.log(
       `Querying stats for clientId: ${clientId} and studioId: ${studioId}`
     );
@@ -105,6 +108,8 @@ app.get("/api/stats/:clientId/:studioId", (req, res) => {
       data: {
         clientId,
         studioId,
+        ip,
+        userAgent: req.headers["user-agent"],
       },
       level: "info",
     });
@@ -126,8 +131,16 @@ app.get("/api/stats/:clientId/:studioId", (req, res) => {
 
     res.json(stats[key]);
   } catch (error) {
+    const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
     console.error("Error fetching stats:", error);
-    Sentry.captureException(error);
+
+    // Add IP context to the error
+    Sentry.withScope((scope) => {
+      scope.setExtra("ip", ip);
+      scope.setExtra("userAgent", req.headers["user-agent"]);
+      Sentry.captureException(error);
+    });
+
     res.status(500).json({ error: "Internal server error" });
   }
 });
