@@ -2,13 +2,29 @@ service: mad-wrapped-api
 
 frameworkVersion: "3"
 
+plugins:
+  - serverless-dotenv-plugin
+  - serverless-offline
+  - serverless-plugin-typescript
+  - serverless-domain-manager
+
 provider:
   name: aws
   runtime: nodejs18.x
   region: us-east-1
   environment:
-    NODE_ENV: ${opt:stage, 'dev'}
-    SENTRY_DSN: ${env:SENTRY_DSN, 'https://4c189b3c619c168c6b2ea6e730957b85@o4508526308622336.ingest.us.sentry.io/4508526317076480'}
+    STAGE: ${opt:stage, 'dev'}
+    SENTRY_DSN: ${env:SENTRY_DSN, ''}
+    MONGODB_URI: ${env:MONGODB_URI, ''}
+    MONGODB_DB_NAME: ${env:MONGODB_DB_NAME, ''}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - ses:SendEmail
+            - ses:SendRawEmail
+          Resource: "*"
 
 package:
   patterns:
@@ -19,6 +35,8 @@ package:
     - "!test/**"
     - "!README.md"
     - "node_modules/**"
+    - "!node_modules/.cache/**"
+    - "!node_modules/@types/**"
     - "src/**"
     - "package.json"
     - "package-lock.json"
@@ -28,6 +46,7 @@ package:
 functions:
   api:
     handler: src/handler.handler
+    timeout: 15
     events:
       - http:
           path: /api/stats/{clientId}/{studioId}
@@ -37,11 +56,14 @@ functions:
           path: /api/health
           method: get
           cors: true
-
-plugins:
-  - serverless-offline
-  - serverless-plugin-typescript
-  - serverless-domain-manager
+      - http:
+          path: /api/lookup
+          method: post
+          cors: true
+      - http:
+          path: /api/notify-request
+          method: post
+          cors: true
 
 custom:
   serverless-offline:
@@ -59,5 +81,10 @@ custom:
     securityPolicy: tls_1_2
     apiType: rest
     autoDomain: true
-    mapping:
-      production: api.madwrapped.com
+  dotenv:
+    path: .env
+    basePath: ./
+    include:
+      - SENTRY_DSN
+      - MONGODB_URI
+      - MONGODB_DB_NAME
