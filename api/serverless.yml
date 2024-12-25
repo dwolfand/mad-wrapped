@@ -1,0 +1,63 @@
+service: mad-wrapped-api
+
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  environment:
+    NODE_ENV: ${opt:stage, 'dev'}
+    SENTRY_DSN: ${env:SENTRY_DSN, 'https://4c189b3c619c168c6b2ea6e730957b85@o4508526308622336.ingest.us.sentry.io/4508526317076480'}
+
+package:
+  patterns:
+    - "!.git/**"
+    - "!.gitignore"
+    - "!.serverless/**"
+    - "!.vscode/**"
+    - "!test/**"
+    - "!README.md"
+    - "node_modules/**"
+    - "src/**"
+    - "package.json"
+    - "package-lock.json"
+    - "tsconfig.json"
+    - "data/**"
+
+functions:
+  api:
+    handler: src/handler.handler
+    events:
+      - http:
+          path: /api/stats/{clientId}/{studioId}
+          method: get
+          cors: true
+      - http:
+          path: /api/health
+          method: get
+          cors: true
+
+plugins:
+  - serverless-offline
+  - serverless-plugin-typescript
+  - serverless-domain-manager
+
+custom:
+  serverless-offline:
+    httpPort: 8080
+  typescript:
+    srcPath: src
+    include:
+      - src/**/*.ts
+  customDomain:
+    domainName: api.madwrapped.com
+    basePath: ""
+    stage: ${opt:stage, 'dev'}
+    createRoute53Record: true
+    endpointType: "regional"
+    securityPolicy: tls_1_2
+    apiType: rest
+    autoDomain: true
+    mapping:
+      production: api.madwrapped.com

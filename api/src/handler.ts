@@ -1,52 +1,50 @@
+import serverless from "serverless-http";
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import fs from "fs";
 import path from "path";
 import * as Sentry from "@sentry/node";
-
-console.log("Starting server");
+import { ProfilingIntegration } from "@sentry/profiling-node";
 
 // Load environment variables
 dotenv.config();
 
-// Initialize Sentry
-Sentry.init({
-  dsn: process.env.SENTRY_DSN,
-  environment: process.env.NODE_ENV || "development",
-  // Set tracesSampleRate to 1.0 to capture 100% of transactions
-  tracesSampleRate: 1.0,
-});
-
-Sentry.profiler.startProfiler();
+// Initialize Sentry only if DSN is provided
+if (process.env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    environment: process.env.NODE_ENV || "development",
+    integrations: [new ProfilingIntegration()],
+    tracesSampleRate: 1.0,
+    profilesSampleRate: 1.0,
+  });
+}
 
 const app = express();
-const port = parseInt(process.env.PORT || "8080", 10);
-const host = "0.0.0.0";
-
-console.log("Server starting on port", port);
 
 // CORS configuration
 const corsOptions = {
   origin: [
-    "http://localhost:5173", // Local development
-    "http://localhost:4173", // Local preview
-    "https://madwrapped.com", // Production domain
-    "https://www.madwrapped.com", // Production www subdomain
+    "http://localhost:5173",
+    "http://localhost:4173",
+    "https://madwrapped.com",
+    "https://www.madwrapped.com",
   ],
-  methods: ["GET"], // Only allow GET requests
+  methods: ["GET"],
   credentials: true,
 };
 
 // Middleware
+app.use(Sentry.Handlers.requestHandler());
 app.use(cors(corsOptions));
 app.use(express.json());
 
 // Try to find the stats file in different locations
 function findStatsFile() {
   const possiblePaths = [
-    path.join(__dirname, "../data/workout_stats.json"), // Production path
-    path.join(__dirname, "../../data/workout_stats.json"), // Development path
+    path.join(__dirname, "../data/workout_stats.json"),
+    path.join(__dirname, "../../data/workout_stats.json"),
   ];
 
   for (const filePath of possiblePaths) {
@@ -81,49 +79,40 @@ function readStats() {
   }
 }
 
-// Function to write stats
-function writeStats(stats: any) {
-  try {
-    fs.writeFileSync(STATS_FILE, JSON.stringify(stats, null, 2));
-  } catch (error) {
-    console.error("Error writing stats file:", error);
-  }
-}
-
 // Get stats by clientId endpoint
 app.get("/api/stats/:clientId/:studioId", (req, res) => {
   try {
     const { clientId, studioId } = req.params;
-    // Get IP address, considering forwarded headers for proxy situations
     const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
 
     console.log(
       `Querying stats for clientId: ${clientId} and studioId: ${studioId}`
     );
 
-    // Track the query in Sentry
-    Sentry.addBreadcrumb({
-      category: "stats-query",
-      message: "Stats queried",
-      data: {
-        clientId,
-        studioId,
-        ip,
-        userAgent: req.headers["user-agent"],
-      },
-      level: "info",
-    });
+    if (process.env.SENTRY_DSN) {
+      Sentry.addBreadcrumb({
+        category: "stats-query",
+        message: "Stats queried",
+        data: {
+          clientId,
+          studioId,
+          ip,
+          userAgent: req.headers["user-agent"],
+        },
+        level: "info",
+      });
+    }
 
     const stats = readStats();
-
-    // Create a composite key using both clientId and studioId
     const key = `${clientId}-${studioId}`;
 
     if (!stats[key]) {
-      Sentry.captureMessage(
-        `Stats not found for client ${clientId} and studio ${studioId}`,
-        "warning"
-      );
+      if (process.env.SENTRY_DSN) {
+        Sentry.captureMessage(
+          `Stats not found for client ${clientId} and studio ${studioId}`,
+          "warning"
+        );
+      }
       return res
         .status(404)
         .json({ error: "Stats not found for this client ID and studio" });
@@ -134,12 +123,13 @@ app.get("/api/stats/:clientId/:studioId", (req, res) => {
     const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
     console.error("Error fetching stats:", error);
 
-    // Add IP context to the error
-    Sentry.withScope((scope) => {
-      scope.setExtra("ip", ip);
-      scope.setExtra("userAgent", req.headers["user-agent"]);
-      Sentry.captureException(error);
-    });
+    if (process.env.SENTRY_DSN) {
+      Sentry.withScope((scope) => {
+        scope.setExtra("ip", ip);
+        scope.setExtra("userAgent", req.headers["user-agent"]);
+        Sentry.captureException(error);
+      });
+    }
 
     res.status(500).json({ error: "Internal server error" });
   }
@@ -150,14 +140,10 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "ok" });
 });
 
-Sentry.setupExpressErrorHandler(app);
-
-// Start server
-function startServer() {
-  app.listen(port, host, () => {
-    console.log(`Server running on ${host}:${port}`);
-  });
-  console.log("Server started");
+// Only set up Sentry error handler if DSN is provided
+if (process.env.SENTRY_DSN) {
+  app.use(Sentry.Handlers.errorHandler());
 }
 
-startServer();
+// Create the serverless handler
+export const handler = serverless(app);
