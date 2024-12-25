@@ -1,6 +1,10 @@
 import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
 import { getStudioShortName } from "./studios";
 
+if (!process.env.ADMIN_EMAIL || !process.env.ADMIN_CC_EMAIL) {
+  throw new Error("ADMIN_EMAIL and ADMIN_CC_EMAIL are required");
+}
+
 interface StatsLinkEmailData {
   email: string;
   firstName: string;
@@ -35,7 +39,8 @@ export async function sendAdminNotification({
   const command = new SendEmailCommand({
     Source: "MAD Wrapped <no-reply@madwrapped.com>",
     Destination: {
-      ToAddresses: ["dwolfand@gmail.com"],
+      ToAddresses: [process.env.ADMIN_EMAIL!],
+      CcAddresses: [process.env.ADMIN_CC_EMAIL!],
     },
     Message: {
       Subject: {

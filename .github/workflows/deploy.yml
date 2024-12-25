@@ -76,4 +76,6 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          ADMIN_CC_EMAIL: ${{ secrets.ADMIN_CC_EMAIL }}
         run: npm run deploy-ci

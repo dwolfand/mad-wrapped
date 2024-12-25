@@ -18,6 +18,8 @@ provider:
     MONGODB_URI: ${env:MONGODB_URI, ''}
     MONGODB_DB_NAME: ${env:MONGODB_DB_NAME, ''}
     SENTRY_DSN: ${env:SENTRY_DSN, ''}
+    ADMIN_EMAIL: ${env:ADMIN_EMAIL, ''}
+    ADMIN_CC_EMAIL: ${env:ADMIN_CC_EMAIL, ''}
   iam:
     role:
       statements:
@@ -92,4 +94,5 @@ custom:
       - SENTRY_DSN
       - MONGODB_URI
       - MONGODB_DB_NAME
-      - SENDGRID_API_KEY
+      - ADMIN_EMAIL
+      - ADMIN_CC_EMAIL
