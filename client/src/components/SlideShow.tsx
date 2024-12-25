@@ -24,6 +24,14 @@ const SlideShow = ({ stats }: SlideShowProps) => {
   const slideRef = useRef<HTMLDivElement>(null);
   const swipeConfidenceThreshold = 50;
 
+  // Track slide view in GA4
+  const trackSlideView = useCallback((slideId: string) => {
+    window.gtag?.("event", "page_view", {
+      page_title: `MAD Wrapped - ${slideId}`,
+      page_path: `/wrapped/${slideId}`,
+    });
+  }, []);
+
   const paginate = (direction: number) => {
     setCurrentSlide((prev) => {
       const nextSlide = prev + direction;
@@ -32,6 +40,13 @@ const SlideShow = ({ stats }: SlideShowProps) => {
       return nextSlide;
     });
   };
+
+  // Track slide changes
+  useEffect(() => {
+    if (slides[currentSlide]) {
+      trackSlideView(slides[currentSlide].id);
+    }
+  }, [currentSlide, trackSlideView]);
 
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
     if (event.key === "ArrowLeft") {
