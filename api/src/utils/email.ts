@@ -102,7 +102,7 @@ export async function sendStatsLinkEmail({
             <div style="padding: 40px 20px;">
               <h1 style="margin: 0 0 20px 0;">Hi ${firstName}! 👋</h1>
               <p style="margin: 0 0 20px 0;">Your MAD Wrapped stats are ready to view!</p>
-              <p style="margin: 0 0 30px 0;">Click the button below to see your personalized workout journey:</p>
+              <p style="margin: 0 0 30px 0; font-weight: bold;">Unwrap your year of MADness:</p>
               <div style="text-align: center; margin: 30px 0;">
                 <a href="${statsUrl}" 
                    style="background-color: #06C7A6; color: black; padding: 12px 24px; 
@@ -113,7 +113,7 @@ export async function sendStatsLinkEmail({
               </div>
               <p style="margin: 20px 0 10px 0;">Or copy and paste this link into your browser:</p>
               <p style="margin: 0 0 30px 0; color: #06C7A6;">${statsUrl}</p>
-              <p style="margin: 0;">Enjoy reliving your fitness journey!</p>
+              <p style="margin: 0;">You’ve crushed it this year! Celebrate your progress and let’s make 2025 even more epic!</p>
               <hr style="margin: 30px 0; border: none; height: 1px; background-color: rgba(0, 0, 0, 0.1);">
               <p style="color: #888888; font-size: 12px; margin: 0;">
                 This email was sent by MAD Wrapped. If you didn't request this, you can ignore this email.
