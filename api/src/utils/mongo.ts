@@ -5,13 +5,12 @@ dotenv.config();
 
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017";
 const MONGODB_DB_NAME = process.env.MONGODB_DB_NAME || "mad_wrapped";
+const CONNECT_TIMEOUT_MS = 5000;
 
 let mongoClient: MongoClient | null = null;
 
 export async function connectToMongo(): Promise<MongoClient> {
   try {
-    console.log("Attempting MongoDB connection...");
-
     if (!mongoClient) {
       mongoClient = new MongoClient(MONGODB_URI, {
         serverApi: {
@@ -19,42 +18,52 @@ export async function connectToMongo(): Promise<MongoClient> {
           strict: true,
           deprecationErrors: true,
         },
-        connectTimeoutMS: 5000, // 5 seconds
-        socketTimeoutMS: 25000, // 25 seconds
+        connectTimeoutMS: CONNECT_TIMEOUT_MS,
+        socketTimeoutMS: CONNECT_TIMEOUT_MS,
       });
 
-      await mongoClient.connect();
-      console.log("Successfully connected to MongoDB");
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => {
+          reject(
+            new Error(
+              `MongoDB connection timed out after ${CONNECT_TIMEOUT_MS}ms`
+            )
+          );
+        }, CONNECT_TIMEOUT_MS);
+      });
 
-      // Test the connection
-      const db = mongoClient.db(MONGODB_DB_NAME);
-      await db.command({ ping: 1 });
-      console.log("MongoDB connection test successful");
-    } else {
-      console.log("Reusing existing MongoDB connection");
+      await Promise.race([mongoClient.connect(), timeoutPromise]);
+      await mongoClient.db(MONGODB_DB_NAME).command({ ping: 1 });
     }
 
     return mongoClient;
   } catch (error) {
-    console.error("MongoDB connection error:", error);
     if (mongoClient) {
-      await mongoClient.close();
+      try {
+        await mongoClient.close();
+      } catch (closeError) {
+        console.error("Error closing MongoDB connection:", closeError);
+      }
       mongoClient = null;
     }
-    throw error;
+    throw new Error(
+      `Failed to connect to MongoDB: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`
+    );
   }
 }
 
 export async function getDb(): Promise<Db> {
   try {
-    console.log("Getting MongoDB database instance...");
     const client = await connectToMongo();
-    const db = client.db(MONGODB_DB_NAME);
-    console.log("Successfully got database instance");
-    return db;
+    return client.db(MONGODB_DB_NAME);
   } catch (error) {
-    console.error("Error getting database instance:", error);
-    throw error;
+    throw new Error(
+      `Failed to get database instance: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`
+    );
   }
 }
 
@@ -63,7 +72,6 @@ export async function closeConnection(): Promise<void> {
     try {
       await mongoClient.close();
       mongoClient = null;
-      console.log("MongoDB connection closed");
     } catch (error) {
       console.error("Error closing MongoDB connection:", error);
       throw error;
