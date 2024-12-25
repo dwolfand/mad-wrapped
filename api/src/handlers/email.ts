@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import * as Sentry from "@sentry/node";
 import { getDb } from "../utils/mongo";
 import { logActivity } from "../utils/logger";
-import { sendStatsLinkEmail } from "../utils/email";
+import { sendStatsLinkEmail, sendAdminNotification } from "../utils/email";
 
 const stage = process.env.STAGE || "dev";
 
@@ -83,7 +83,7 @@ export async function lookupEmail(req: Request, res: Response) {
 }
 
 export async function requestNotification(req: Request, res: Response) {
-  const { email, firstName, lastName } = req.body;
+  const { email, firstName, lastName, studio, isCustomStudio } = req.body;
   const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
   const userAgent = req.headers["user-agent"];
 
@@ -91,10 +91,10 @@ export async function requestNotification(req: Request, res: Response) {
     return res.status(400).json({ error: "Email is required" });
   }
 
-  if (!firstName || !lastName) {
+  if (!firstName || !lastName || !studio) {
     return res
       .status(400)
-      .json({ error: "First name and last name are required" });
+      .json({ error: "First name, last name, and studio are required" });
   }
 
   try {
@@ -117,11 +117,32 @@ export async function requestNotification(req: Request, res: Response) {
       email,
       firstName,
       lastName,
+      studio,
+      isCustomStudio,
       timestamp: new Date(),
       ip,
       userAgent,
       stage,
       status: "pending",
+    });
+
+    // Send admin notification (don't await to keep response time fast)
+    sendAdminNotification({
+      email,
+      firstName,
+      lastName,
+      studio,
+      isCustomStudio,
+    }).catch((error) => {
+      console.error("Error sending admin notification:", error);
+      // Log the error but don't affect the response
+      logActivity({
+        type: "error",
+        error: error instanceof Error ? error.message : "Unknown error",
+        email,
+        firstName,
+        lastName,
+      });
     });
 
     await logActivity({
@@ -132,6 +153,8 @@ export async function requestNotification(req: Request, res: Response) {
       email,
       firstName,
       lastName,
+      studio,
+      isCustomStudio,
     });
 
     res.json({
@@ -163,6 +186,8 @@ export async function requestNotification(req: Request, res: Response) {
       email,
       firstName,
       lastName,
+      studio,
+      isCustomStudio,
     });
 
     res.status(500).json({ error: "Internal server error" });
