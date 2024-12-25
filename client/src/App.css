@@ -20,12 +20,12 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: var(--background);
   color: var(--text-primary);
   font-family: "Rubik", -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
+  min-height: 100vh;
+  overflow-y: auto;
 }
 
 body::before {
@@ -79,13 +79,12 @@ body::after {
 }
 
 #root {
-  min-width: 100vw;
   min-height: 100vh;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   color: var(--text-primary);
-  overflow-x: hidden;
   position: relative;
   z-index: 1;
 }
@@ -130,8 +129,6 @@ body::after {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  min-height: 100vh;
   padding: 20px;
   text-align: center;
   gap: 20px;
@@ -139,6 +136,19 @@ body::after {
   backdrop-filter: blur(10px);
   border-radius: 20px;
   margin: 1rem;
+  width: calc(100% - 2rem);
+}
+
+@media (min-width: 768px) {
+  #root {
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .error-container {
+    width: 500px;
+    margin: 0;
+  }
 }
 
 .form-title {
@@ -208,7 +218,9 @@ body::after {
   color: var(--text-secondary);
 }
 
-.client-id-form select {
+.client-id-form select,
+.notification-form select,
+.email-form select {
   padding: 12px 16px;
   border-radius: 25px;
   border: 2px solid var(--mad-fade-green);
@@ -225,12 +237,16 @@ body::after {
   padding-right: 40px;
 }
 
-.client-id-form select:focus {
+.client-id-form select:focus,
+.notification-form select:focus,
+.email-form select:focus {
   border-color: var(--mad-green);
   box-shadow: 0 0 0 2px var(--mad-fade-green);
 }
 
-.client-id-form select option {
+.client-id-form select option,
+.notification-form select option,
+.email-form select option {
   background: var(--background-darker);
   color: var(--text-primary);
   padding: 12px;
@@ -254,4 +270,120 @@ body::after {
   height: 1px;
   background: var(--text-secondary);
   opacity: 0.3;
+}
+
+.form-subtitle {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  margin-bottom: 20px;
+}
+
+.email-form,
+.notification-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 300px;
+}
+
+.email-input,
+.name-input {
+  padding: 12px 16px;
+  border-radius: 25px;
+  border: 2px solid var(--mad-fade-green);
+  background: var(--background-darker);
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.email-input:focus,
+.name-input:focus {
+  border-color: var(--mad-green);
+  box-shadow: 0 0 0 2px var(--mad-fade-green);
+}
+
+.email-input::placeholder,
+.name-input::placeholder {
+  color: var(--text-secondary);
+}
+
+.submit-btn {
+  background-color: var(--mad-green);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.submit-btn:hover {
+  background-color: var(--mad-light-green);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.submit-btn:active {
+  transform: translateY(0);
+  background-color: var(--mad-dark-green);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.advanced-toggle {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 8px;
+  margin-top: 20px;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.advanced-toggle:hover {
+  color: var(--text-primary);
+}
+
+.view-stats-btn {
+  background-color: var(--background-darker);
+  color: var(--mad-green);
+  border: 2px solid var(--mad-green);
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.view-stats-btn:hover {
+  background-color: var(--mad-fade-green);
+  transform: translateY(-2px);
+}
+
+.view-stats-btn:active {
+  transform: translateY(0);
+  background-color: var(--mad-dark-green);
+  color: white;
+}
+
+.success {
+  color: var(--mad-green);
+  font-size: 1rem;
+  margin-bottom: 10px;
+  padding: 10px;
+  background: var(--mad-fade-green);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.madabolic-logo {
+  width: 200px;
+  height: auto;
+  margin-bottom: 20px;
 }

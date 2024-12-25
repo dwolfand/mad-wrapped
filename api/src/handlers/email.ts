@@ -21,16 +21,16 @@ export async function lookupEmail(req: Request, res: Response) {
 
     if (!stats) {
       await logActivity({
-        clientId: "unknown",
-        studioId: "unknown",
+        type: "email_lookup",
         ip,
         userAgent,
         status: 404,
         error: `Email not found: ${email}`,
+        email,
       });
       return res.status(404).json({
         error: "Email not found",
-        message: "Would you like to be notified when your stats are ready?",
+        message: "Would you like to be notified when it's ready?",
       });
     }
 
@@ -43,6 +43,7 @@ export async function lookupEmail(req: Request, res: Response) {
     });
 
     await logActivity({
+      type: "email_lookup",
       clientId: stats.clientId,
       studioId: stats.studioId,
       ip,
@@ -69,8 +70,7 @@ export async function lookupEmail(req: Request, res: Response) {
     }
 
     await logActivity({
-      clientId: "unknown",
-      studioId: "unknown",
+      type: "error",
       ip,
       userAgent,
       status: 500,
@@ -107,7 +107,8 @@ export async function requestNotification(req: Request, res: Response) {
     if (existingRequest) {
       return res.json({
         message:
-          "You're already on the notification list. We'll email you when your stats are ready!",
+          "You're already on the notification list. We'll email you when it's ready!",
+        firstName,
       });
     }
 
@@ -124,20 +125,18 @@ export async function requestNotification(req: Request, res: Response) {
     });
 
     await logActivity({
-      clientId: "unknown",
-      studioId: "unknown",
+      type: "notification_request",
       ip,
       userAgent,
       status: 200,
       email,
-      type: "notification_request",
       firstName,
       lastName,
     });
 
     res.json({
       message:
-        "You've been added to the notification list. We'll email you when your stats are ready!",
+        "You've been added to the notification list. We'll email you when it's ready!",
       firstName,
     });
   } catch (error) {
@@ -156,14 +155,12 @@ export async function requestNotification(req: Request, res: Response) {
     }
 
     await logActivity({
-      clientId: "unknown",
-      studioId: "unknown",
+      type: "error",
       ip,
       userAgent,
       status: 500,
       error: error instanceof Error ? error.message : "Unknown error",
       email,
-      type: "notification_request",
       firstName,
       lastName,
     });

@@ -46,6 +46,7 @@ export async function getStats(req: Request, res: Response) {
       }
       // Log the failed attempt
       await logActivity({
+        type: "stats_not_found",
         clientId,
         studioId,
         ip,
@@ -60,6 +61,7 @@ export async function getStats(req: Request, res: Response) {
 
     // Log the successful request
     await logActivity({
+      type: "stats_lookup",
       clientId,
       studioId,
       ip,
@@ -82,6 +84,7 @@ export async function getStats(req: Request, res: Response) {
 
     // Log the error
     await logActivity({
+      type: "error",
       clientId,
       studioId,
       ip,

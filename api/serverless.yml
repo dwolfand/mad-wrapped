@@ -17,14 +17,7 @@ provider:
     SENTRY_DSN: ${env:SENTRY_DSN, ''}
     MONGODB_URI: ${env:MONGODB_URI, ''}
     MONGODB_DB_NAME: ${env:MONGODB_DB_NAME, ''}
-  iam:
-    role:
-      statements:
-        - Effect: Allow
-          Action:
-            - ses:SendEmail
-            - ses:SendRawEmail
-          Resource: "*"
+    SENDGRID_API_KEY: ${env:SENDGRID_API_KEY, ''}
 
 package:
   patterns:
@@ -88,3 +81,4 @@ custom:
       - SENTRY_DSN
       - MONGODB_URI
       - MONGODB_DB_NAME
+      - SENDGRID_API_KEY

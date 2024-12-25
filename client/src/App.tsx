@@ -25,20 +25,28 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [email, setEmail] = useState("");
+  const [showNotificationForm, setShowNotificationForm] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const [clientId, setClientId] = useState("");
   const [studioId, setStudioId] = useState(DUPONT_ID);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [selectedStudio, setSelectedStudio] = useState(DUPONT_ID);
+  const [otherStudio, setOtherStudio] = useState("");
+  const [showOtherStudio, setShowOtherStudio] = useState(false);
 
   // Helper function to clean client ID
   const cleanClientId = (id: string) => {
     const decodedId = decodeURIComponent(id);
-    const cleanedId = decodedId.replace(/[^0-9]/g, "");
-    return cleanedId;
+    return decodedId.replace(/[^0-9]/g, "");
   };
 
   // Helper function to clean studio ID
   const cleanStudioId = (id: string) => {
     const decodedId = decodeURIComponent(id);
-    return decodedId.replace(/[^\w-]/g, ""); // Remove any characters that aren't alphanumeric or hyphens
+    return decodedId.replace(/[^\w-]/g, "");
   };
 
   // Helper function to validate studio ID
@@ -67,6 +75,7 @@ function App() {
     try {
       setLoading(true);
       setError(null);
+      setSuccessMessage(null);
 
       const cleanedId = cleanClientId(id);
       const validatedStudioId = validateStudioId(studio);
@@ -105,6 +114,90 @@ function App() {
     }
   };
 
+  const handleEmailLookup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+      setSuccessMessage(null);
+      setShowNotificationForm(false);
+
+      const response = await fetch(`${API_BASE_URL}/api/lookup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          setShowNotificationForm(true);
+          setError(
+            "We don't have your stats quite yet. Would you like to be notified when they're ready?"
+          );
+        } else {
+          setError(data.error || "Something went wrong. Please try again.");
+        }
+      } else {
+        setSuccessMessage(
+          "Check your email for a link to your year in review!"
+        );
+      }
+    } catch (err) {
+      setError("Failed to process your request. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleNotificationRequest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !firstName || !lastName) return;
+
+    const studio = showOtherStudio ? otherStudio : selectedStudio;
+    if (!studio) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+      setSuccessMessage(null);
+
+      const response = await fetch(`${API_BASE_URL}/api/notify-request`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          firstName,
+          lastName,
+          studio,
+          isCustomStudio: showOtherStudio,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Failed to submit notification request.");
+      } else {
+        setSuccessMessage(data.message);
+        setShowNotificationForm(false);
+      }
+    } catch (err) {
+      setError(
+        "Failed to submit notification request. Please try again later."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleIntroComplete = () => {
     setShowIntro(false);
   };
@@ -113,7 +206,7 @@ function App() {
     fetchStats("100003434", DUPONT_ID);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleDirectAccess = (e: React.FormEvent) => {
     e.preventDefault();
     if (clientId) {
       fetchStats(clientId, studioId);
@@ -127,36 +220,124 @@ function App() {
   if (error || !stats) {
     return (
       <div className="error-container">
-        <div className="form-title">
-          Enter your client ID below or check out an example!
+        <img src="/mad_logo.svg" alt="MADabolic" className="madabolic-logo" />
+        <div className="form-title">MAD Wrapped 2024</div>
+        <div className="form-subtitle">
+          Enter your email and we'll send you a direct link to your year in
+          review
         </div>
         {error && <div className="error">{error}</div>}
-        <form onSubmit={handleSubmit} className="client-id-form">
-          <input
-            type="text"
-            value={clientId}
-            onChange={(e) => setClientId(e.target.value)}
-            placeholder="Enter your client ID"
-            className="client-id-input"
-          />
-          <select
-            value={studioId}
-            onChange={(e) => setStudioId(e.target.value)}
+        {successMessage && <div className="success">{successMessage}</div>}
+
+        {!showNotificationForm ? (
+          <form onSubmit={handleEmailLookup} className="email-form">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              className="email-input"
+              required
+            />
+            <button type="submit" className="submit-btn">
+              Get My Wrapped
+            </button>
+          </form>
+        ) : (
+          <form
+            onSubmit={handleNotificationRequest}
+            className="notification-form"
           >
-            {STUDIOS.map((studio) => (
-              <option key={studio.id} value={studio.id}>
-                {studio.name}
-              </option>
-            ))}
-          </select>
-          <button type="submit" className="view-example-btn">
-            View My Stats
-          </button>
-        </form>
+            <input
+              type="text"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              placeholder="First Name"
+              className="name-input"
+              required
+            />
+            <input
+              type="text"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              placeholder="Last Name"
+              className="name-input"
+              required
+            />
+            <select
+              value={showOtherStudio ? "other" : selectedStudio}
+              onChange={(e) => {
+                if (e.target.value === "other") {
+                  setShowOtherStudio(true);
+                } else {
+                  setShowOtherStudio(false);
+                  setSelectedStudio(e.target.value);
+                }
+              }}
+              className="select"
+              required
+            >
+              <option value="">Select your studio</option>
+              {STUDIOS.map((studio) => (
+                <option key={studio.id} value={studio.id}>
+                  {studio.name}
+                </option>
+              ))}
+              <option value="other">Other</option>
+            </select>
+            {showOtherStudio && (
+              <input
+                type="text"
+                value={otherStudio}
+                onChange={(e) => setOtherStudio(e.target.value)}
+                placeholder="Enter your studio name"
+                className="name-input"
+                required
+              />
+            )}
+            <button type="submit" className="submit-btn">
+              Notify Me When Ready
+            </button>
+          </form>
+        )}
+
         <div className="divider">or</div>
         <button onClick={handleViewDavidsData} className="view-example-btn">
           See David's Year in Review
         </button>
+
+        <button
+          onClick={() => setShowAdvanced(!showAdvanced)}
+          className="advanced-toggle"
+        >
+          {showAdvanced ? "Hide Advanced Options" : "Show Advanced Options"}
+        </button>
+
+        {showAdvanced && (
+          <form onSubmit={handleDirectAccess} className="client-id-form">
+            <input
+              type="text"
+              value={clientId}
+              onChange={(e) => setClientId(e.target.value)}
+              placeholder="Enter your client ID"
+              className="client-id-input"
+            />
+            <select
+              value={studioId}
+              onChange={(e) => setStudioId(e.target.value)}
+              className="select"
+            >
+              {STUDIOS.map((studio) => (
+                <option key={studio.id} value={studio.id}>
+                  {studio.name}
+                </option>
+              ))}
+            </select>
+            <button type="submit" className="view-stats-btn">
+              View Stats Directly
+            </button>
+          </form>
+        )}
       </div>
     );
   }

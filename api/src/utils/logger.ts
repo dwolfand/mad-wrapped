@@ -1,16 +1,25 @@
 import { getDb } from "./mongo";
 
-interface ActivityLogData {
-  clientId: string;
-  studioId: string;
-  ip: string | string[] | undefined;
-  userAgent?: string;
-  status: number;
-  error?: string;
+type LogType =
+  | "notification_request"
+  | "stats_lookup"
+  | "email_lookup"
+  | "stats_not_found"
+  | "error";
+
+export interface ActivityLogData {
+  type: LogType;
   email?: string;
-  type?: string;
   firstName?: string;
   lastName?: string;
+  clientId?: string;
+  studioId?: string;
+  studio?: string;
+  isCustomStudio?: boolean;
+  ip?: string | string[];
+  userAgent?: string;
+  status?: number;
+  error?: any;
 }
 
 export async function logActivity(data: ActivityLogData) {
