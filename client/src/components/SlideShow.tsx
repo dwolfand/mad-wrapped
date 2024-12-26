@@ -16,21 +16,28 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 interface SlideShowProps {
   stats: WorkoutStats;
   peerStats?: PeerStats;
+  studioId: string;
 }
 
-const SlideShow = ({ stats }: SlideShowProps) => {
+const SlideShow = ({ stats, studioId }: SlideShowProps) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [dragDirection, setDragDirection] = useState<number>(0);
   const slideRef = useRef<HTMLDivElement>(null);
   const swipeConfidenceThreshold = 50;
 
   // Track slide view in GA4
-  const trackSlideView = useCallback((slideId: string) => {
-    window.gtag?.("event", "page_view", {
-      page_title: `MAD Wrapped - ${slideId}`,
-      page_path: `/wrapped/${slideId}`,
-    });
-  }, []);
+  const trackSlideView = useCallback(
+    (slideId: string) => {
+      window.gtag?.("event", "page_view", {
+        page_title: `MAD Wrapped - ${slideId}`,
+        page_path: `/wrapped/${slideId}`,
+        client_id: stats.clientId,
+        studio_id: studioId,
+        unique_id: `${stats.clientId}-${studioId}`,
+      });
+    },
+    [stats.clientId, studioId]
+  );
 
   const paginate = (direction: number) => {
     setCurrentSlide((prev) => {

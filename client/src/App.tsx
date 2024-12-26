@@ -99,8 +99,8 @@ function App() {
       setShowIntro(true);
 
       // Set analytics user properties and track view
-      setUserProperties(cleanedId);
-      trackView(cleanedId);
+      setUserProperties(cleanedId, validatedStudioId);
+      trackView(cleanedId, validatedStudioId);
 
       // Update URL without refreshing the page
       const newUrl = new URL(window.location.href);
@@ -354,7 +354,7 @@ function App() {
           onComplete={handleIntroComplete}
         />
       ) : (
-        stats && <SlideShow stats={stats} />
+        stats && <SlideShow stats={stats} studioId={studioId} />
       )}
     </div>
   );
