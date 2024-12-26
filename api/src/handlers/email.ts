@@ -3,6 +3,7 @@ import * as Sentry from "@sentry/node";
 import { getDb } from "../utils/mongo";
 import { logActivity } from "../utils/logger";
 import { sendStatsLinkEmail, sendAdminNotification } from "../utils/email";
+import { getStudioShortName } from "../utils/studios";
 
 const stage = process.env.STAGE || "dev";
 
@@ -121,6 +122,7 @@ export async function requestNotification(req: Request, res: Response) {
       firstName,
       lastName,
       studio,
+      studioShortName: getStudioShortName(studio),
       isCustomStudio,
       timestamp: new Date(),
       ip,
