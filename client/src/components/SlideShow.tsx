@@ -347,7 +347,8 @@ const SlideShow = ({ stats, studioId }: SlideShowProps) => {
                           {location.name
                             .replace("MADabolic - ", "")
                             .replace("MADabolic ", "")
-                            .replace("Madabolic ", "")}
+                            .replace("Madabolic ", "")
+                            .replace("MAD ", "")}
                         </div>
                         <div className="location-percentage">
                           {location.count}
