@@ -9,7 +9,8 @@
     "dev": "AWS_PROFILE=personal serverless offline",
     "deploy": "serverless deploy --stage dev --aws-profile personal",
     "deploy:prod": "serverless deploy --stage production --aws-profile personal",
-    "deploy-ci": "serverless deploy --stage production"
+    "deploy-ci": "serverless deploy --stage production",
+    "send-emails": "ts-node src/scripts/send_emails.ts"
   },
   "dependencies": {
     "@aws-sdk/client-ses": "^3.716.0",
