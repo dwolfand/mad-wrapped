@@ -4,8 +4,14 @@ import { pool } from "../utils/postgres";
 import { logActivity } from "../utils/logger";
 import { sendStatsLinkEmail, sendAdminNotification } from "../utils/email";
 import { getStudioShortName } from "../utils/studios";
+import { Lambda } from "@aws-sdk/client-lambda";
 
 const stage = process.env.STAGE || "dev";
+
+// Initialize Lambda client
+const lambdaClient = new Lambda({
+  region: process.env.AWS_REGION || "us-east-1",
+});
 
 export async function lookupEmail(req: Request, res: Response) {
   const { email } = req.body;
@@ -35,30 +41,122 @@ export async function lookupEmail(req: Request, res: Response) {
     );
 
     if (result.rows.length === 0) {
-      await logActivity({
-        type: "email_lookup",
-        ip,
-        userAgent,
-        status: 404,
-        error: `Email not found: ${email}`,
-        email,
-      });
-      return res.status(404).json({
-        error: "Email not found",
-        message: "Would you like to be notified when it's ready?",
-      });
+      console.log(
+        `Email not found in database: ${email}. Invoking scraper Lambda...`
+      );
+
+      try {
+        // Invoke the scraper Lambda function
+        const scraperFunctionName = `mad-wrapped-api-${stage}-scraper`;
+        console.log(`Invoking Lambda function: ${scraperFunctionName}`);
+
+        const invokeResponse = await lambdaClient.invoke({
+          FunctionName: scraperFunctionName,
+          InvocationType: "RequestResponse",
+          Payload: JSON.stringify({ email }),
+        });
+
+        // Parse the response
+        const payload = JSON.parse(
+          new TextDecoder().decode(invokeResponse.Payload)
+        );
+
+        console.log("Scraper Lambda response:", JSON.stringify(payload));
+
+        if (!payload.success || !payload.client) {
+          console.log(`❌ User not found in Mindbody: ${email}`);
+
+          await logActivity({
+            type: "email_lookup",
+            ip,
+            userAgent,
+            status: 404,
+            error: `Email not found in database or Mindbody: ${email}`,
+            email,
+          });
+
+          return res.status(404).json({
+            error: "Email not found",
+            message: "Would you like to be notified when it's ready?",
+          });
+        }
+
+        console.log(`✅ User scraped successfully: ${payload.client.name}`);
+
+        // Parse name from "LAST, FIRST" format
+        let firstName = "";
+        if (payload.client.name.includes(",")) {
+          const [, firstPart] = payload.client.name
+            .split(",")
+            .map((s: string) => s.trim());
+          firstName = firstPart
+            .toLowerCase()
+            .replace(/\b\w/g, (c: string) => c.toUpperCase());
+        } else {
+          const parts = payload.client.name.split(" ");
+          firstName =
+            parts[0]
+              ?.toLowerCase()
+              .replace(/\b\w/g, (c: string) => c.toUpperCase()) || "";
+        }
+
+        // Send email with stats link
+        await sendStatsLinkEmail({
+          email: payload.client.email,
+          firstName,
+          clientId: payload.client.dupontLocationId || payload.client.id,
+          studioId: payload.client.location,
+        });
+
+        await logActivity({
+          type: "email_lookup",
+          clientId: payload.client.dupontLocationId || payload.client.id,
+          studioId: payload.client.location,
+          ip,
+          userAgent,
+          status: 200,
+          email,
+        });
+
+        return res.json({
+          message: "Stats link has been sent to your email",
+          firstName,
+        });
+      } catch (scraperError) {
+        console.error("Error invoking scraper Lambda:", scraperError);
+
+        // Log the error
+        await logActivity({
+          type: "email_lookup",
+          ip,
+          userAgent,
+          status: 404,
+          error: `Email not found and scraper failed: ${email}`,
+          email,
+        });
+
+        return res.status(404).json({
+          error: "Email not found",
+          message: "Would you like to be notified when it's ready?",
+        });
+      }
     }
 
     const client = result.rows[0];
-    
+
     // Parse name from "LAST, FIRST" format
     let firstName = "";
     if (client.name.includes(",")) {
       const [, firstPart] = client.name.split(",").map((s: string) => s.trim());
-      firstName = firstPart.toLowerCase().replace(/\b\w/g, (c: string) => c.toUpperCase());
+      firstName = firstPart
+        .toLowerCase()
+        .replace(/\b\w/g, (c: string) => c.toUpperCase());
     } else {
       const parts = client.name.split(" ");
-      firstName = parts[0]?.toLowerCase().replace(/\b\w/g, (c: string) => c.toUpperCase()) || "";
+      firstName =
+        parts[0]
+          ?.toLowerCase()
+          .replace(/\b\w/g, (c: string) => c.toUpperCase()) || "";
     }
 
     // Send email with stats link using dupont_location_id
