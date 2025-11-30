@@ -129,7 +129,7 @@ export async function lookupEmail(req: Request, res: Response) {
     });
 
     res.json({
-      message: "Stats link has been sent to your email",
+      message: "Check your email for a link to your year in review!",
       firstName,
     });
   } catch (error) {

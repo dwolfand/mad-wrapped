@@ -145,7 +145,7 @@ function App() {
         }
       } else {
         setSuccessMessage(
-          "Check your email for a link to your year in review!"
+          data.message || "Check your email for a link to your year in review!"
         );
       }
     } catch (err) {
