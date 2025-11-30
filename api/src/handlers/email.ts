@@ -42,85 +42,36 @@ export async function lookupEmail(req: Request, res: Response) {
 
     if (result.rows.length === 0) {
       console.log(
-        `Email not found in database: ${email}. Invoking scraper Lambda...`
+        `Email not found in database: ${email}. Invoking scraper Lambda asynchronously...`
       );
 
       try {
-        // Invoke the scraper Lambda function
+        // Invoke the scraper Lambda function asynchronously (fire and forget)
         const scraperFunctionName = `mad-wrapped-api-${stage}-scraper`;
-        console.log(`Invoking Lambda function: ${scraperFunctionName}`);
+        console.log(
+          `Invoking Lambda function asynchronously: ${scraperFunctionName}`
+        );
 
-        const invokeResponse = await lambdaClient.invoke({
+        await lambdaClient.invoke({
           FunctionName: scraperFunctionName,
-          InvocationType: "RequestResponse",
+          InvocationType: "Event", // Async invocation
           Payload: JSON.stringify({ email }),
         });
 
-        // Parse the response
-        const payload = JSON.parse(
-          new TextDecoder().decode(invokeResponse.Payload)
-        );
-
-        console.log("Scraper Lambda response:", JSON.stringify(payload));
-
-        if (!payload.success || !payload.client) {
-          console.log(`❌ User not found in Mindbody: ${email}`);
-
-          await logActivity({
-            type: "email_lookup",
-            ip,
-            userAgent,
-            status: 404,
-            error: `Email not found in database or Mindbody: ${email}`,
-            email,
-          });
-
-          return res.status(404).json({
-            error: "Email not found",
-            message: "Would you like to be notified when it's ready?",
-          });
-        }
-
-        console.log(`✅ User scraped successfully: ${payload.client.name}`);
-
-        // Parse name from "LAST, FIRST" format
-        let firstName = "";
-        if (payload.client.name.includes(",")) {
-          const [, firstPart] = payload.client.name
-            .split(",")
-            .map((s: string) => s.trim());
-          firstName = firstPart
-            .toLowerCase()
-            .replace(/\b\w/g, (c: string) => c.toUpperCase());
-        } else {
-          const parts = payload.client.name.split(" ");
-          firstName =
-            parts[0]
-              ?.toLowerCase()
-              .replace(/\b\w/g, (c: string) => c.toUpperCase()) || "";
-        }
-
-        // Send email with stats link
-        await sendStatsLinkEmail({
-          email: payload.client.email,
-          firstName,
-          clientId: payload.client.dupontLocationId || payload.client.id,
-          studioId: payload.client.location,
-        });
+        console.log(`✅ Scraper Lambda invoked asynchronously for: ${email}`);
 
         await logActivity({
           type: "email_lookup",
-          clientId: payload.client.dupontLocationId || payload.client.id,
-          studioId: payload.client.location,
           ip,
           userAgent,
-          status: 200,
+          status: 202, // Accepted
           email,
         });
 
-        return res.json({
-          message: "Stats link has been sent to your email",
-          firstName,
+        return res.status(202).json({
+          message:
+            "We're searching for your data! If we find a matching member, we'll send you an email with your stats link shortly.",
+          status: "processing",
         });
       } catch (scraperError) {
         console.error("Error invoking scraper Lambda:", scraperError);
@@ -130,14 +81,14 @@ export async function lookupEmail(req: Request, res: Response) {
           type: "email_lookup",
           ip,
           userAgent,
-          status: 404,
-          error: `Email not found and scraper failed: ${email}`,
+          status: 500,
+          error: `Failed to invoke scraper: ${email}`,
           email,
         });
 
-        return res.status(404).json({
-          error: "Email not found",
-          message: "Would you like to be notified when it's ready?",
+        return res.status(500).json({
+          error: "Unable to process request",
+          message: "Please try again later or contact support.",
         });
       }
     }

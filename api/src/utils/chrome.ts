@@ -17,16 +17,16 @@ export async function getChrome(): Promise<ChromeInstance> {
 
   if (isLambda) {
     console.log("🚀 Launching Chrome in Lambda environment...");
-    
+
     // Use @sparticuz/chromium as recommended in the article
     const chromium = require("@sparticuz/chromium");
     const puppeteer = require("puppeteer-core");
-    
+
     // Set Chromium flags for Lambda environment
     await chromium.font(
       "https://raw.githack.com/googlei18n/noto-emoji/master/fonts/NotoColorEmoji.ttf"
     );
-    
+
     browser = await puppeteer.launch({
       args: [
         ...chromium.args,
@@ -44,7 +44,7 @@ export async function getChrome(): Promise<ChromeInstance> {
     });
   } else {
     console.log("🚀 Launching Chrome in local environment...");
-    
+
     // Use local Puppeteer for development
     const puppeteer = require("puppeteer");
     browser = await puppeteer.launch({
@@ -70,4 +70,3 @@ export async function getChrome(): Promise<ChromeInstance> {
     },
   };
 }
-

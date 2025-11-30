@@ -87,7 +87,7 @@ export async function sendStatsLinkEmail({
   clientId,
   studioId,
 }: StatsLinkEmailData) {
-  const statsUrl = `https://madwrapped.com/?clientId=${clientId}&studioId=${studioId}`;
+  const statsUrl = `https://madwrapped.com/?clientId=${clientId}`;
 
   const command = new SendEmailCommand({
     Source: "MAD Wrapped <no-reply@madwrapped.com>",
@@ -131,7 +131,7 @@ export async function sendStatsLinkEmail({
                     </div>
                     <p style="margin: 20px 0 10px 0;">Or copy and paste this link into your browser:</p>
                     <p style="margin: 0 0 30px 0; color: #06C7A6;">${statsUrl}</p>
-                    <p style="margin: 0;">You've crushed it this year! Celebrate your progress and let's make 2025 even more epic!</p>
+                    <p style="margin: 0;">You've crushed it this year! Celebrate your progress and let's make 2026 even more epic!</p>
                     <hr style="margin: 30px 0; border: none; height: 1px; background-color: rgba(0, 0, 0, 0.1);">
                     <p style="color: #888888; font-size: 12px; margin: 0;">
                       This email was sent by MAD Wrapped. If you didn't request this, you can ignore this email.

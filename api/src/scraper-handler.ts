@@ -15,6 +15,7 @@ import {
   updateLastVisitsFetchedAt,
   saveAuthToken,
 } from "./utils/dbOperations";
+import { sendStatsLinkEmail } from "./utils/email";
 
 // Initialize Sentry only if DSN is provided
 if (process.env.SENTRY_DSN) {
@@ -122,6 +123,37 @@ export const handler: Handler<ScraperEvent, ScraperResponse> = async (
     // Close browser
     await chromeInstance.cleanup();
 
+    // Parse name from "LAST, FIRST" format
+    let firstName = "";
+    if (userData.client.name.includes(",")) {
+      const [, firstPart] = userData.client.name
+        .split(",")
+        .map((s: string) => s.trim());
+      firstName = firstPart
+        .toLowerCase()
+        .replace(/\b\w/g, (c: string) => c.toUpperCase());
+    } else {
+      const parts = userData.client.name.split(" ");
+      firstName =
+        parts[0]
+          ?.toLowerCase()
+          .replace(/\b\w/g, (c: string) => c.toUpperCase()) || "";
+    }
+
+    // Send email with stats link
+    try {
+      await sendStatsLinkEmail({
+        email: userData.client.email,
+        firstName,
+        clientId: userData.client.dupontLocationId || userData.client.id,
+        studioId: userData.client.location,
+      });
+      console.log(`📧 Stats link email sent to: ${email}`);
+    } catch (emailError) {
+      console.error("Error sending stats link email:", emailError);
+      // Don't fail the whole scrape if email fails
+    }
+
     return {
       success: true,
       client: userData.client,
@@ -154,4 +186,3 @@ export const handler: Handler<ScraperEvent, ScraperResponse> = async (
     };
   }
 };
-

@@ -535,13 +535,17 @@ async function computePeerStats(
     } else {
       const parts = row.name.split(" ");
       firstName =
-        parts[0]?.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase()) || "";
+        parts[0]
+          ?.toLowerCase()
+          .replace(/\b\w/g, (c) => c.toUpperCase())
+          .trim() || "";
       lastName =
         parts
           .slice(1)
           .join(" ")
           .toLowerCase()
-          .replace(/\b\w/g, (c) => c.toUpperCase()) || "";
+          .replace(/\b\w/g, (c) => c.toUpperCase())
+          .trim() || "";
     }
     return {
       firstName,
