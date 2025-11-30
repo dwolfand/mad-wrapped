@@ -36,6 +36,7 @@ provider:
           Resource: "*"
 
 package:
+  individually: true
   patterns:
     - "!.git/**"
     - "!.gitignore"
@@ -43,13 +44,7 @@ package:
     - "!.vscode/**"
     - "!test/**"
     - "!README.md"
-    - "node_modules/**"
-    - "!node_modules/.cache/**"
-    - "!node_modules/@types/**"
-    - "src/**"
-    - "package.json"
-    - "package-lock.json"
-    - "tsconfig.json"
+    - "!node_modules/**"
     - "data/**"
 
 functions:
