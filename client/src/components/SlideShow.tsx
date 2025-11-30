@@ -405,7 +405,7 @@ const SlideShow = ({ stats, studioId }: SlideShowProps) => {
               numberOfPieces={250}
             />
           </div>
-          <h2>Ready to Crush 2025?</h2>
+          <h2>Ready to Crush 2026?</h2>
           <div className="share-section">
             <p className="share-text">Share your MAD journey on Instagram!</p>
             <p className="tag-text">
@@ -432,7 +432,7 @@ const SlideShow = ({ stats, studioId }: SlideShowProps) => {
     <div className="slideshow">
       <div className="slide-header">
         <img src="/mad_logo.svg" alt="MAD Logo" className="mad-logo" />
-        <h1 className="year-title">{stats.firstName}'s 2024 Year in Review</h1>
+        <h1 className="year-title">{stats.firstName}'s 2025 Year in Review</h1>
       </div>
       <motion.div
         className="slide-container"

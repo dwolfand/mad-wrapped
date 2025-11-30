@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import * as Sentry from "@sentry/node";
-import { getDb } from "../utils/mongo";
+import { pool } from "../utils/postgres";
 import { logActivity } from "../utils/logger";
 import { sendStatsLinkEmail, sendAdminNotification } from "../utils/email";
 import { getStudioShortName } from "../utils/studios";
@@ -17,12 +17,24 @@ export async function lookupEmail(req: Request, res: Response) {
   }
 
   try {
-    const db = await getDb();
-    const stats = await db.collection("workout_stats").findOne({
-      email: email.toLowerCase(),
-    });
+    // Look up client by email - must have dupont_location_id and 2025 visits
+    const result = await pool.query(
+      `
+      SELECT DISTINCT c.id, c.location, c.dupont_location_id, c.name, c.email
+      FROM clients c
+      INNER JOIN visits v ON v.client_original_id = c.id AND v.client_location = c.location
+      WHERE LOWER(c.email) = LOWER($1)
+        AND c.dupont_location_id IS NOT NULL
+        AND v.class_date >= '2025-01-01'
+        AND v.class_date < '2026-01-01'
+        AND NOT v.cancelled
+        AND NOT v.missed
+      LIMIT 1
+      `,
+      [email]
+    );
 
-    if (!stats) {
+    if (result.rows.length === 0) {
       await logActivity({
         type: "email_lookup",
         ip,
@@ -37,18 +49,30 @@ export async function lookupEmail(req: Request, res: Response) {
       });
     }
 
-    // Send email with stats link
+    const client = result.rows[0];
+    
+    // Parse name from "LAST, FIRST" format
+    let firstName = "";
+    if (client.name.includes(",")) {
+      const [, firstPart] = client.name.split(",").map((s: string) => s.trim());
+      firstName = firstPart.toLowerCase().replace(/\b\w/g, (c: string) => c.toUpperCase());
+    } else {
+      const parts = client.name.split(" ");
+      firstName = parts[0]?.toLowerCase().replace(/\b\w/g, (c: string) => c.toUpperCase()) || "";
+    }
+
+    // Send email with stats link using dupont_location_id
     await sendStatsLinkEmail({
-      email: stats.email,
-      firstName: stats.firstName,
-      clientId: stats.clientId,
-      studioId: stats.studioId,
+      email: client.email,
+      firstName,
+      clientId: client.dupont_location_id || client.id,
+      studioId: client.location,
     });
 
     await logActivity({
       type: "email_lookup",
-      clientId: stats.clientId,
-      studioId: stats.studioId,
+      clientId: client.dupont_location_id || client.id,
+      studioId: client.location,
       ip,
       userAgent,
       status: 200,
@@ -57,7 +81,7 @@ export async function lookupEmail(req: Request, res: Response) {
 
     res.json({
       message: "Stats link has been sent to your email",
-      firstName: stats.firstName,
+      firstName,
     });
   } catch (error) {
     console.error("Error processing email lookup:", error);
@@ -101,14 +125,19 @@ export async function requestNotification(req: Request, res: Response) {
   }
 
   try {
-    const db = await getDb();
     const lowerEmail = email.toLowerCase();
 
     // Check if already requested
-    const existingRequest = await db
-      .collection("notification_requests")
-      .findOne({ email: lowerEmail });
-    if (existingRequest) {
+    const existingRequest = await pool.query(
+      `
+      SELECT id FROM notification_requests
+      WHERE email = $1
+      LIMIT 1
+      `,
+      [lowerEmail]
+    );
+
+    if (existingRequest.rows.length > 0) {
       return res.json({
         message:
           "You're already on the notification list. We'll email you when it's ready!",
@@ -117,19 +146,27 @@ export async function requestNotification(req: Request, res: Response) {
     }
 
     // Save new request
-    await db.collection("notification_requests").insertOne({
-      email: lowerEmail,
-      firstName,
-      lastName,
-      studio,
-      studioShortName: getStudioShortName(studio),
-      isCustomStudio,
-      timestamp: new Date(),
-      ip,
-      userAgent,
-      stage,
-      status: "pending",
-    });
+    await pool.query(
+      `
+      INSERT INTO notification_requests (
+        email, first_name, last_name, studio, studio_short_name,
+        is_custom_studio, ip, user_agent, stage, status
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      `,
+      [
+        lowerEmail,
+        firstName,
+        lastName,
+        studio,
+        getStudioShortName(studio),
+        isCustomStudio || false,
+        Array.isArray(ip) ? ip[0] : ip,
+        userAgent,
+        stage,
+        "pending",
+      ]
+    );
 
     // Send admin notification (don't await to keep response time fast)
     sendAdminNotification({

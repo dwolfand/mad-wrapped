@@ -221,7 +221,7 @@ function App() {
     return (
       <div className="error-container">
         <img src="/mad_logo.svg" alt="MADabolic" className="madabolic-logo" />
-        <div className="form-title">MAD Wrapped 2024</div>
+        <div className="form-title">MAD Wrapped 2025</div>
         <div className="form-subtitle">
           Enter your email and we'll send you a direct link to your year in
           review.

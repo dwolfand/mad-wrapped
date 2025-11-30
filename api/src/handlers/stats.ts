@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import * as Sentry from "@sentry/node";
-import { getDb } from "../utils/mongo";
+import { pool } from "../utils/postgres";
+import { computeStatsForClient } from "../utils/computeStats";
 import { logActivity } from "../utils/logger";
 
 const stage = process.env.STAGE || "dev";
@@ -30,12 +31,8 @@ export async function getStats(req: Request, res: Response) {
       });
     }
 
-    // Get stats from MongoDB
-    const db = await getDb();
-    const stats = await db.collection("workout_stats").findOne({
-      clientId: clientId,
-      studioId: studioId,
-    });
+    // Get stats from PostgreSQL
+    const stats = await computeStatsForClient(pool, clientId, studioId);
 
     if (!stats) {
       // Log the failed attempt
