@@ -374,18 +374,18 @@ export async function computeStatsForClient(
       perfectWeeksResult.rows[0].perfect_weeks || "0"
     );
 
-    // Get class type counts (using type_group field) (2025 only)
+    // Get class type counts (using class_types lookup table) (2025 only)
     const classTypesResult = await client.query(
       `
       SELECT 
-        COUNT(*) FILTER (WHERE LOWER(type_group) LIKE '%durability%' AND NOT cancelled AND NOT missed) as durability_classes,
-        COUNT(*) FILTER (WHERE LOWER(type_group) LIKE '%anaerobic%' AND NOT cancelled AND NOT missed) as anaerobic_classes,
-        COUNT(*) FILTER (WHERE LOWER(type_group) LIKE '%momentum%' AND NOT cancelled AND NOT missed) as momentum_classes,
-        COUNT(*) FILTER (WHERE LOWER(type_group) NOT LIKE '%durability%' AND LOWER(type_group) NOT LIKE '%anaerobic%' AND LOWER(type_group) NOT LIKE '%momentum%' AND NOT cancelled AND NOT missed) as deload_classes
-      FROM visits
-      WHERE client_original_id = $1 AND client_location = $2
-        AND type_group IS NOT NULL
-        AND EXTRACT(YEAR FROM class_date) = 2025
+        COUNT(*) FILTER (WHERE ct.class_type = 'DURABILITY' AND NOT v.cancelled AND NOT v.missed) as durability_classes,
+        COUNT(*) FILTER (WHERE ct.class_type = 'ANAEROBIC' AND NOT v.cancelled AND NOT v.missed) as anaerobic_classes,
+        COUNT(*) FILTER (WHERE ct.class_type = 'MOMENTUM' AND NOT v.cancelled AND NOT v.missed) as momentum_classes,
+        COUNT(*) FILTER (WHERE ct.class_type = 'DELOAD' AND NOT v.cancelled AND NOT v.missed) as deload_classes
+      FROM visits v
+      LEFT JOIN class_types ct ON v.class_date::DATE = ct.class_date
+      WHERE v.client_original_id = $1 AND v.client_location = $2
+        AND EXTRACT(YEAR FROM v.class_date) = 2025
     `,
       [actualClientId, actualLocation]
     );
