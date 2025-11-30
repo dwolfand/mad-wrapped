@@ -8,8 +8,8 @@
     "start": "ts-node src/server.ts",
     "dev": "AWS_PROFILE=personal serverless offline",
     "deploy": "serverless deploy --stage dev --aws-profile personal",
-    "deploy:prod": "serverless deploy --stage production --aws-profile personal",
-    "deploy-ci": "serverless deploy --stage production",
+    "deploy:prod": "serverless deploy --stage production --aws-profile personal --verbose",
+    "deploy-ci": "serverless deploy --stage production --verbose",
     "send-emails": "ts-node src/scripts/send_emails.ts"
   },
   "dependencies": {
