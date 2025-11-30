@@ -83,4 +83,6 @@ jobs:
           DB_PORT: ${{ secrets.DB_PORT }}
           DB_NAME: ${{ secrets.DB_NAME }}
           DB_USER: ${{ secrets.DB_USER }}
+          MINDBODY_EMAIL: ${{ secrets.MINDBODY_EMAIL }}
+          MINDBODY_PASSWORD: ${{ secrets.MINDBODY_PASSWORD }}
         run: npm run deploy-ci
