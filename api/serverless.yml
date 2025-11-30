@@ -99,7 +99,7 @@ custom:
     endpointType: "regional"
     securityPolicy: tls_1_2
     apiType: rest
-    autoDomain: true
+    autoDomain: false
   dotenv:
     path: .env
     basePath: ./
