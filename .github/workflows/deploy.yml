@@ -19,7 +19,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: "20"
           cache: "npm"
           cache-dependency-path: "./client/package-lock.json"
 
@@ -35,7 +35,7 @@ jobs:
         uses: actions/configure-pages@v4
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v3
         with:
           path: "./client/dist"
 
@@ -61,7 +61,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: "20"
           cache: "npm"
           cache-dependency-path: "./api/package-lock.json"
 
