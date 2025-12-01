@@ -133,10 +133,31 @@ export async function upsertVisit(
       ? classTypeMap[visit.typeId]
       : visit.typeName || null;
 
+  // Get the client's dupont_location_id
+  const clientResult = await pool.query(
+    `SELECT dupont_location_id FROM clients WHERE id = $1 AND location = $2`,
+    [clientOriginalId, clientLocation]
+  );
+
+  if (clientResult.rows.length === 0) {
+    throw new Error(
+      `Client not found: ${clientOriginalId} at location ${clientLocation}`
+    );
+  }
+
+  const dupontLocationId = clientResult.rows[0].dupont_location_id;
+
+  if (!dupontLocationId) {
+    throw new Error(
+      `Client ${clientOriginalId} at ${clientLocation} is missing dupont_location_id`
+    );
+  }
+
   const query = `
     INSERT INTO visits (
       client_original_id,
       client_location,
+      client_dupont_location_id,
       visit_ref_no,
       class_type,
       class_id,
@@ -164,9 +185,10 @@ export async function upsertVisit(
       creation_date_time,
       value
     )
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30)
     ON CONFLICT (client_original_id, client_location, visit_ref_no)
     DO UPDATE SET
+      client_dupont_location_id = EXCLUDED.client_dupont_location_id,
       class_type = EXCLUDED.class_type,
       class_id = EXCLUDED.class_id,
       class_name = EXCLUDED.class_name,
@@ -198,6 +220,7 @@ export async function upsertVisit(
   await pool.query(query, [
     clientOriginalId,
     clientLocation,
+    dupontLocationId,
     visit.visitRefNo,
     classTypeName,
     visit.classId || null,

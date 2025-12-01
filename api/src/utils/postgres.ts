@@ -24,3 +24,4 @@ export async function closePool(): Promise<void> {
 }
 
 export { pool };
+

@@ -123,8 +123,8 @@ export async function computeStatsForClient(
           .replace(/\b\w/g, (c) => c.toUpperCase()) || "";
     }
 
-    // Use the actual client_original_id and location from the database
-    const actualClientId = clientInfo.id;
+    // Use the dupont_location_id as the unique identifier for all queries
+    const dupontLocationId = clientInfo.dupont_location_id;
     const actualLocation = clientInfo.location;
 
     // Get first visit date (all time, not just 2025)
@@ -132,10 +132,10 @@ export async function computeStatsForClient(
       `
       SELECT MIN(class_date) as first_seen
       FROM visits
-      WHERE client_original_id = $1 AND client_location = $2
+      WHERE client_dupont_location_id = $1
         AND NOT cancelled AND NOT missed
     `,
-      [actualClientId, actualLocation]
+      [dupontLocationId]
     );
 
     const firstSeen =
@@ -148,10 +148,10 @@ export async function computeStatsForClient(
         COUNT(*) FILTER (WHERE NOT cancelled AND NOT missed) as total_classes,
         COUNT(*) FILTER (WHERE cancelled OR missed) as total_cancellations
       FROM visits
-      WHERE client_original_id = $1 AND client_location = $2
+      WHERE client_dupont_location_id = $1
         AND EXTRACT(YEAR FROM class_date) = 2025
     `,
-      [actualClientId, actualLocation]
+      [dupontLocationId]
     );
 
     const totalClasses = parseInt(totalsResult.rows[0].total_classes || "0");
@@ -166,7 +166,7 @@ export async function computeStatsForClient(
         CONCAT(trainer_first_name, ' ', trainer_last_name) as coach_name,
         COUNT(*) as class_count
       FROM visits
-      WHERE client_original_id = $1 AND client_location = $2 
+      WHERE client_dupont_location_id = $1
         AND NOT cancelled AND NOT missed
         AND trainer_first_name IS NOT NULL
         AND EXTRACT(YEAR FROM class_date) = 2025
@@ -174,7 +174,7 @@ export async function computeStatsForClient(
       ORDER BY class_count DESC
       LIMIT 1
     `,
-      [actualClientId, actualLocation]
+      [dupontLocationId]
     );
 
     const topCoach = topCoachResult.rows[0]?.coach_name || "Unknown";
@@ -186,7 +186,7 @@ export async function computeStatsForClient(
         TO_CHAR(class_time, 'HH12:MI AM') as time_slot,
         COUNT(*) as slot_count
       FROM visits
-      WHERE client_original_id = $1 AND client_location = $2 
+      WHERE client_dupont_location_id = $1
         AND NOT cancelled AND NOT missed
         AND class_time IS NOT NULL
         AND EXTRACT(YEAR FROM class_date) = 2025
@@ -194,7 +194,7 @@ export async function computeStatsForClient(
       ORDER BY slot_count DESC
       LIMIT 3
     `,
-      [actualClientId, actualLocation]
+      [dupontLocationId]
     );
 
     const favoriteTimeOfDay = timeSlotResult.rows[0]?.time_slot || "06:00 AM";
@@ -207,14 +207,14 @@ export async function computeStatsForClient(
         TO_CHAR(class_date, 'Day') as day_name,
         COUNT(*) as day_count
       FROM visits
-      WHERE client_original_id = $1 AND client_location = $2 
+      WHERE client_dupont_location_id = $1
         AND NOT cancelled AND NOT missed
         AND EXTRACT(YEAR FROM class_date) = 2025
       GROUP BY TO_CHAR(class_date, 'Day'), EXTRACT(DOW FROM class_date)
       ORDER BY day_count DESC
       LIMIT 1
     `,
-      [actualClientId, actualLocation]
+      [dupontLocationId]
     );
 
     const mostFrequentDay = dayResult.rows[0]?.day_name?.trim() || "Monday";
@@ -225,7 +225,7 @@ export async function computeStatsForClient(
       WITH visit_dates AS (
         SELECT DISTINCT class_date::date as visit_date
         FROM visits
-        WHERE client_original_id = $1 AND client_location = $2 
+        WHERE client_dupont_location_id = $1
           AND NOT cancelled AND NOT missed
           AND EXTRACT(YEAR FROM class_date) = 2025
         ORDER BY class_date::date
@@ -246,7 +246,7 @@ export async function computeStatsForClient(
       SELECT COALESCE(MAX(streak_length), 1) as longest_streak
       FROM streak_lengths
     `,
-      [actualClientId, actualLocation]
+      [dupontLocationId]
     );
 
     const longestStreak = parseInt(streakResult.rows[0]?.longest_streak || "1");
@@ -257,7 +257,7 @@ export async function computeStatsForClient(
       SELECT COUNT(*) as late_bookings
       FROM visits
       WHERE 
-        client_original_id = $1 AND client_location = $2
+        client_dupont_location_id = $1
         AND NOT cancelled
         AND NOT missed
         AND creation_date_time IS NOT NULL
@@ -266,7 +266,7 @@ export async function computeStatsForClient(
         AND (class_date + class_time - creation_date_time) < interval '2 hours'
         AND EXTRACT(YEAR FROM class_date) = 2025
     `,
-      [actualClientId, actualLocation]
+      [dupontLocationId]
     );
 
     const totalLateBookings = parseInt(
@@ -283,11 +283,11 @@ export async function computeStatsForClient(
                NULLIF(COUNT(*) FILTER (WHERE NOT cancelled AND NOT missed), 0))
         END as early_bird_score
       FROM visits
-      WHERE client_original_id = $1 AND client_location = $2
+      WHERE client_dupont_location_id = $1
         AND class_time IS NOT NULL
         AND EXTRACT(YEAR FROM class_date) = 2025
     `,
-      [actualClientId, actualLocation]
+      [dupontLocationId]
     );
 
     const earlyBirdScore = parseInt(
@@ -301,13 +301,13 @@ export async function computeStatsForClient(
         TO_CHAR(class_date, 'Mon') as month,
         COUNT(*) as count
       FROM visits
-      WHERE client_original_id = $1 AND client_location = $2 
+      WHERE client_dupont_location_id = $1
         AND NOT cancelled AND NOT missed
         AND EXTRACT(YEAR FROM class_date) = 2025
       GROUP BY TO_CHAR(class_date, 'Mon'), EXTRACT(MONTH FROM class_date)
       ORDER BY EXTRACT(MONTH FROM class_date)
     `,
-      [actualClientId, actualLocation]
+      [dupontLocationId]
     );
 
     const classesPerMonth = MONTHS.map((month) => {
@@ -327,7 +327,7 @@ export async function computeStatsForClient(
           COUNT(*) as visit_count,
           ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER ()) as percentage
         FROM visits
-        WHERE client_original_id = $1 AND client_location = $2 
+        WHERE client_dupont_location_id = $1
           AND NOT cancelled AND NOT missed
           AND location_name IS NOT NULL
           AND EXTRACT(YEAR FROM class_date) = 2025
@@ -337,7 +337,7 @@ export async function computeStatsForClient(
       SELECT *
       FROM location_counts
     `,
-      [actualClientId, actualLocation]
+      [dupontLocationId]
     );
 
     const favoriteLocation = {
@@ -359,7 +359,7 @@ export async function computeStatsForClient(
           DATE_TRUNC('week', class_date) as week_start,
           COUNT(*) FILTER (WHERE NOT cancelled AND NOT missed) as classes_in_week
         FROM visits
-        WHERE client_original_id = $1 AND client_location = $2
+        WHERE client_dupont_location_id = $1
           AND EXTRACT(YEAR FROM class_date) = 2025
         GROUP BY week_start
       )
@@ -367,7 +367,7 @@ export async function computeStatsForClient(
       FROM weekly_classes
       WHERE classes_in_week >= 4
     `,
-      [actualClientId, actualLocation]
+      [dupontLocationId]
     );
 
     const perfectMadWeeks = parseInt(
@@ -384,10 +384,10 @@ export async function computeStatsForClient(
         COUNT(*) FILTER (WHERE ct.class_type = 'DELOAD' AND NOT v.cancelled AND NOT v.missed) as deload_classes
       FROM visits v
       LEFT JOIN class_types ct ON v.class_date::DATE = ct.class_date
-      WHERE v.client_original_id = $1 AND v.client_location = $2
+      WHERE v.client_dupont_location_id = $1
         AND EXTRACT(YEAR FROM v.class_date) = 2025
     `,
-      [actualClientId, actualLocation]
+      [dupontLocationId]
     );
 
     const durabilityClasses = parseInt(
@@ -403,15 +403,11 @@ export async function computeStatsForClient(
       classTypesResult.rows[0]?.deload_classes || "0"
     );
 
-    // Compute peer comparison stats
-    const peerComparison = await computePeerStats(
-      client,
-      actualClientId,
-      actualLocation
-    );
+    // Compute peer comparison stats (global across all locations)
+    const peerComparison = await computePeerStats(client, dupontLocationId);
 
-    // Compute global stats
-    const globalStats = await computeGlobalStats(client, actualLocation);
+    // Compute global stats (across all MADabolic locations)
+    const globalStats = await computeGlobalStats(client);
 
     return {
       clientId, // Return the dupont_location_id as clientId
@@ -446,17 +442,13 @@ export async function computeStatsForClient(
   }
 }
 
-async function computePeerStats(
-  client: any,
-  clientId: string,
-  studioId: string
-) {
-  // Calculate averages across all members in the same studio (2025 only)
+async function computePeerStats(client: any, dupontLocationId: string) {
+  // Calculate averages across all MADabolic members globally (2025 only)
   const averagesResult = await client.query(
     `
     WITH member_stats AS (
       SELECT 
-        client_original_id,
+        client_dupont_location_id,
         COUNT(*) FILTER (WHERE NOT cancelled AND NOT missed) as total_classes,
         NULLIF(COUNT(*) FILTER (WHERE NOT cancelled AND NOT missed), 0) / 12.0 as classes_per_month,
         CASE 
@@ -467,9 +459,8 @@ async function computePeerStats(
         COUNT(*) FILTER (WHERE NOT cancelled AND NOT missed AND creation_date_time IS NOT NULL AND class_date IS NOT NULL AND class_time IS NOT NULL AND (class_date + class_time - creation_date_time) < interval '2 hours') as late_bookings,
         COUNT(*) FILTER (WHERE cancelled OR missed) as cancellations
       FROM visits
-      WHERE client_location = $1
-        AND EXTRACT(YEAR FROM class_date) = 2025
-      GROUP BY client_original_id
+      WHERE EXTRACT(YEAR FROM class_date) = 2025
+      GROUP BY client_dupont_location_id
     )
     SELECT 
       COALESCE(AVG(classes_per_month), 0) as avg_classes_per_month,
@@ -477,8 +468,7 @@ async function computePeerStats(
       COALESCE(AVG(late_bookings), 0) as avg_late_bookings,
       COALESCE(AVG(cancellations), 0) as avg_cancellations
     FROM member_stats
-  `,
-    [studioId]
+  `
   );
 
   // Find top classmates (people who attended the same classes) (2025 only)
@@ -487,35 +477,35 @@ async function computePeerStats(
     WITH member_classes AS (
       SELECT DISTINCT class_date, class_time, location_name
       FROM visits
-      WHERE client_original_id = $1 AND client_location = $2 
+      WHERE client_dupont_location_id = $1
         AND NOT cancelled AND NOT missed
         AND EXTRACT(YEAR FROM class_date) = 2025
     ),
     classmate_counts AS (
       SELECT 
-        c.id,
+        c.dupont_location_id,
         c.name,
         COUNT(*) as shared_classes
       FROM visits v
-      JOIN clients c ON v.client_original_id = c.id AND v.client_location = c.location
+      JOIN clients c ON v.client_dupont_location_id = c.dupont_location_id
       JOIN member_classes mc ON 
         v.class_date = mc.class_date AND 
         v.class_time = mc.class_time AND 
         v.location_name = mc.location_name
       WHERE 
-        -- Exclude the person themselves (composite key)
-        NOT (v.client_original_id = $1 AND v.client_location = $2)
+        -- Exclude the person themselves (using unique dupont_location_id)
+        v.client_dupont_location_id != $1
         AND NOT v.cancelled 
         AND NOT v.missed
         AND EXTRACT(YEAR FROM v.class_date) = 2025
-      GROUP BY c.id, c.name
+      GROUP BY c.dupont_location_id, c.name
       ORDER BY shared_classes DESC
       LIMIT 3
     )
     SELECT *
     FROM classmate_counts
   `,
-    [clientId, studioId]
+    [dupontLocationId]
   );
 
   const topClassmates = classmatesResult.rows.map((row) => {
@@ -554,11 +544,11 @@ async function computePeerStats(
     };
   });
 
-  // Calculate percentiles (2025 only)
+  // Calculate percentiles globally (2025 only)
   const percentileQuery = `
     WITH member_stats AS (
       SELECT 
-        v.client_original_id,
+        v.client_dupont_location_id,
         COUNT(*) FILTER (WHERE NOT cancelled AND NOT missed) as total_classes,
         NULLIF(COUNT(*) FILTER (WHERE NOT cancelled AND NOT missed), 0) / 12.0 as classes_per_month,
         CASE 
@@ -569,33 +559,31 @@ async function computePeerStats(
         COUNT(*) FILTER (WHERE NOT cancelled AND NOT missed AND creation_date_time IS NOT NULL AND class_date IS NOT NULL AND class_time IS NOT NULL AND (class_date + class_time - creation_date_time) < interval '2 hours') as late_bookings,
         COUNT(*) FILTER (WHERE cancelled OR missed) as cancellations
       FROM visits v
-      WHERE v.client_location = $2
-        AND EXTRACT(YEAR FROM v.class_date) = 2025
-      GROUP BY v.client_original_id
+      WHERE EXTRACT(YEAR FROM v.class_date) = 2025
+      GROUP BY v.client_dupont_location_id
     ),
     member_perfect_weeks AS (
       SELECT 
-        client_original_id,
+        client_dupont_location_id,
         COUNT(*) as perfect_weeks_count
       FROM (
         SELECT 
-          client_original_id,
+          client_dupont_location_id,
           DATE_TRUNC('week', class_date) as week_start,
           COUNT(*) FILTER (WHERE NOT cancelled AND NOT missed) as classes_in_week
         FROM visits
-        WHERE client_location = $2
-          AND EXTRACT(YEAR FROM class_date) = 2025
-        GROUP BY client_original_id, DATE_TRUNC('week', class_date)
+        WHERE EXTRACT(YEAR FROM class_date) = 2025
+        GROUP BY client_dupont_location_id, DATE_TRUNC('week', class_date)
       ) weekly_classes
       WHERE classes_in_week >= 4
-      GROUP BY client_original_id
+      GROUP BY client_dupont_location_id
     ),
     full_stats AS (
       SELECT 
         ms.*,
         COALESCE(mpw.perfect_weeks_count, 0) as perfect_weeks
       FROM member_stats ms
-      LEFT JOIN member_perfect_weeks mpw ON ms.client_original_id = mpw.client_original_id
+      LEFT JOIN member_perfect_weeks mpw ON ms.client_dupont_location_id = mpw.client_dupont_location_id
     )
     SELECT 
       ROUND(100.0 * (SELECT COUNT(*) FROM full_stats f2 WHERE f2.total_classes <= fs.total_classes) / NULLIF((SELECT COUNT(*) FROM full_stats), 0)) as total_classes_percentile,
@@ -605,12 +593,11 @@ async function computePeerStats(
       ROUND(100.0 * (SELECT COUNT(*) FROM full_stats f2 WHERE f2.cancellations <= fs.cancellations) / NULLIF((SELECT COUNT(*) FROM full_stats), 0)) as cancellations_percentile,
       ROUND(100.0 * (SELECT COUNT(*) FROM full_stats f2 WHERE f2.perfect_weeks <= fs.perfect_weeks) / NULLIF((SELECT COUNT(*) FROM full_stats), 0)) as perfect_weeks_percentile
     FROM full_stats fs
-    WHERE client_original_id = $1;
+    WHERE client_dupont_location_id = $1;
   `;
 
   const percentilesResult = await client.query(percentileQuery, [
-    clientId,
-    studioId,
+    dupontLocationId,
   ]);
 
   const percentiles = percentilesResult.rows[0]
@@ -661,18 +648,16 @@ async function computePeerStats(
   };
 }
 
-async function computeGlobalStats(client: any, studioId: string) {
-  // Get basic stats for the studio (2025 only)
+async function computeGlobalStats(client: any) {
+  // Get basic stats across all MADabolic locations (2025 only)
   const basicStatsResult = await client.query(
     `
     SELECT 
-      COUNT(DISTINCT client_original_id) as total_members,
+      COUNT(DISTINCT client_dupont_location_id) as total_members,
       COUNT(*) FILTER (WHERE NOT cancelled AND NOT missed) as total_classes
     FROM visits
-    WHERE client_location = $1
-      AND EXTRACT(YEAR FROM class_date) = 2025
-  `,
-    [studioId]
+    WHERE EXTRACT(YEAR FROM class_date) = 2025
+  `
   );
 
   const totalMembers = parseInt(basicStatsResult.rows[0].total_members || "0");
@@ -680,77 +665,69 @@ async function computeGlobalStats(client: any, studioId: string) {
   const averageClassesPerMember =
     totalMembers > 0 ? totalClasses / totalMembers : 0;
 
-  // Get most popular time slot (2025 only)
+  // Get most popular time slot globally (2025 only)
   const timeSlotResult = await client.query(
     `
     SELECT 
       TO_CHAR(class_time, 'HH12:MI AM') as time_slot,
       COUNT(*) as slot_count
     FROM visits
-    WHERE client_location = $1 
-      AND NOT cancelled AND NOT missed
+    WHERE NOT cancelled AND NOT missed
       AND class_time IS NOT NULL
       AND EXTRACT(YEAR FROM class_date) = 2025
     GROUP BY class_time
     ORDER BY slot_count DESC
     LIMIT 1
-  `,
-    [studioId]
+  `
   );
 
-  // Get most popular day (2025 only)
+  // Get most popular day globally (2025 only)
   const dayResult = await client.query(
     `
     SELECT 
       TO_CHAR(class_date, 'Day') as day_name,
       COUNT(*) as day_count
     FROM visits
-    WHERE client_location = $1 
-      AND NOT cancelled AND NOT missed
+    WHERE NOT cancelled AND NOT missed
       AND EXTRACT(YEAR FROM class_date) = 2025
     GROUP BY TO_CHAR(class_date, 'Day'), EXTRACT(DOW FROM class_date)
     ORDER BY day_count DESC
     LIMIT 1
-  `,
-    [studioId]
+  `
   );
 
-  // Get most popular coach (2025 only)
+  // Get most popular coach globally (2025 only)
   const coachResult = await client.query(
     `
     SELECT 
       CONCAT(trainer_first_name, ' ', trainer_last_name) as coach_name,
       COUNT(*) as class_count
     FROM visits
-    WHERE client_location = $1 
-      AND NOT cancelled AND NOT missed
+    WHERE NOT cancelled AND NOT missed
       AND trainer_first_name IS NOT NULL
       AND EXTRACT(YEAR FROM class_date) = 2025
     GROUP BY trainer_first_name, trainer_last_name
     ORDER BY class_count DESC
     LIMIT 1
-  `,
-    [studioId]
+  `
   );
 
-  // Calculate average early bird score (2025 only)
+  // Calculate average early bird score globally (2025 only)
   const earlyBirdResult = await client.query(
     `
     WITH member_scores AS (
       SELECT 
-        client_original_id,
+        client_dupont_location_id,
         COUNT(*) FILTER (WHERE class_time IS NOT NULL AND EXTRACT(HOUR FROM class_time) < 8) * 100.0 / 
         NULLIF(COUNT(*), 0) as early_bird_score
       FROM visits
-      WHERE client_location = $1 
-        AND NOT cancelled AND NOT missed
+      WHERE NOT cancelled AND NOT missed
         AND EXTRACT(YEAR FROM class_date) = 2025
-      GROUP BY client_original_id
+      GROUP BY client_dupont_location_id
     )
     SELECT COALESCE(ROUND(AVG(early_bird_score)), 0) as avg_early_bird_score
     FROM member_scores
-  `,
-    [studioId]
+  `
   );
 
   return {
