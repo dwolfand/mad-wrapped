@@ -100,6 +100,7 @@ custom:
     concurrency: 10
   serverless-offline:
     httpPort: 8080
+    lambdaPort: 3030
   basePaths:
     production: ""
     dev: "dev"
