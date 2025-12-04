@@ -93,7 +93,12 @@ const SlideShow = ({ stats, studioId }: SlideShowProps) => {
         <>
           <h2>Your Year in Review</h2>
           <div className="stat-number">{stats.totalClasses}</div>
-          <p>Total classes crushed</p>
+          <p>Total classes crushed in 2025</p>
+          {stats.allTimeClasses > stats.totalClasses && (
+            <p className="all-time-subtext">
+              {stats.allTimeClasses} all-time classes since you joined
+            </p>
+          )}
         </>
       ),
     },
@@ -140,6 +145,51 @@ const SlideShow = ({ stats, studioId }: SlideShowProps) => {
         </>
       ),
     },
+    ...(stats.classesByYear?.length > 1
+      ? [
+          {
+            id: "yearly-trend",
+            content: (
+              <>
+                <h2>Your MAD Journey</h2>
+                <div className="yearly-chart">
+                  {stats.classesByYear.map((yearData, index) => {
+                    const maxCount = Math.max(
+                      ...stats.classesByYear.map((y) => y.count)
+                    );
+                    const heightPercent = (yearData.count / maxCount) * 100;
+                    return (
+                      <div key={yearData.year} className="year-bar">
+                        <motion.div
+                          className="year-bar-fill"
+                          initial={{ height: 0 }}
+                          animate={{ height: `${heightPercent}%` }}
+                          transition={{ delay: index * 0.15, duration: 0.5 }}
+                        >
+                          <span className="year-bar-count">
+                            {yearData.count}
+                          </span>
+                        </motion.div>
+                        <span
+                          className={`year-label ${
+                            yearData.year === 2025 ? "current-year" : ""
+                          }`}
+                        >
+                          {yearData.year}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <p>
+                  {stats.classesByYear.length} years of crushing it at
+                  MADabolic!
+                </p>
+              </>
+            ),
+          },
+        ]
+      : []),
     {
       id: "monthly-progress",
       content: (

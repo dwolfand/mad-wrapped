@@ -3,6 +3,11 @@ export interface MonthlyCount {
   count: number;
 }
 
+export interface YearlyCount {
+  year: number;
+  count: number;
+}
+
 export interface LocationStats {
   name: string;
   count: number;
@@ -49,6 +54,8 @@ export interface WorkoutStats {
   firstSeen: string;
   lastUpdated: string;
   totalClasses: number;
+  allTimeClasses: number;
+  classesByYear: YearlyCount[];
   topCoach: string;
   favoriteTimeOfDay: string;
   totalCancellations: number;

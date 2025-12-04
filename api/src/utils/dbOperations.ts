@@ -120,6 +120,11 @@ export async function upsertVisit(
   clientLocation: string,
   visit: Visit
 ): Promise<void> {
+  // Filter out "Cross Region Visit" entries as they will be captured in other region data pulls
+  if (visit.typeName === "Cross Region Visit") {
+    return; // Skip this visit
+  }
+
   // Map class type ID to name using a simple lookup
   const classTypeMap: { [key: number]: string } = {
     1: "MAD 60",

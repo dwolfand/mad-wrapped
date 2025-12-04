@@ -24,6 +24,8 @@ interface StatsResult {
   firstSeen: string;
   lastUpdated: string;
   totalClasses: number;
+  allTimeClasses: number;
+  classesByYear: Array<{ year: number; count: number }>;
   totalCancellations: number;
   totalLateBookings: number;
   topCoach: string;
@@ -158,6 +160,41 @@ export async function computeStatsForClient(
     const totalCancellations = parseInt(
       totalsResult.rows[0].total_cancellations || "0"
     );
+
+    // All-time classes and classes by year
+    const allTimeResult = await client.query(
+      `
+      SELECT 
+        COUNT(*) FILTER (WHERE NOT cancelled AND NOT missed) as all_time_classes
+      FROM visits
+      WHERE client_dupont_location_id = $1
+    `,
+      [dupontLocationId]
+    );
+
+    const allTimeClasses = parseInt(
+      allTimeResult.rows[0].all_time_classes || "0"
+    );
+
+    // Classes by year (for historical trend)
+    const classesByYearResult = await client.query(
+      `
+      SELECT 
+        EXTRACT(YEAR FROM class_date)::integer as year,
+        COUNT(*) as count
+      FROM visits
+      WHERE client_dupont_location_id = $1
+        AND NOT cancelled AND NOT missed
+      GROUP BY EXTRACT(YEAR FROM class_date)
+      ORDER BY year ASC
+    `,
+      [dupontLocationId]
+    );
+
+    const classesByYear = classesByYearResult.rows.map((row) => ({
+      year: parseInt(row.year),
+      count: parseInt(row.count),
+    }));
 
     // Top coach calculation (2025 only)
     const topCoachResult = await client.query(
@@ -418,6 +455,8 @@ export async function computeStatsForClient(
       firstSeen: firstSeen,
       lastUpdated: new Date().toISOString(),
       totalClasses,
+      allTimeClasses,
+      classesByYear,
       totalCancellations,
       totalLateBookings,
       topCoach,
