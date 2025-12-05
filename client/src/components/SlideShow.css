@@ -729,8 +729,9 @@
   height: 200px;
   margin: 2rem 0;
   padding: 1rem;
-  gap: 1.5rem;
+  gap: clamp(0.5rem, 2vw, 1.5rem);
   width: 100%;
+  max-width: 100%;
 }
 
 .year-bar {
@@ -738,33 +739,36 @@
   flex-direction: column;
   align-items: center;
   height: 100%;
-  min-width: 50px;
+  flex: 1;
+  min-width: 0;
+  max-width: 60px;
 }
 
 .year-bar-fill {
   width: 100%;
   background: linear-gradient(180deg, var(--mad-dark-green), var(--mad-green), var(--mad-light-green));
   border-radius: 6px 6px 0 0;
-  max-width: 50px;
   box-shadow: 0 0 20px rgba(6, 199, 166, 0.2);
   position: relative;
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding-top: 8px;
+  padding-top: 6px;
+  min-height: 30px;
 }
 
 .year-bar-count {
-  font-size: 1rem;
+  font-size: clamp(0.7rem, 2vw, 1rem);
   font-weight: bold;
   color: #000;
 }
 
 .year-label {
-  margin-top: 0.75rem;
-  font-size: 1rem;
+  margin-top: 0.5rem;
+  font-size: clamp(0.65rem, 2vw, 1rem);
   color: var(--text-secondary);
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .year-label.current-year {
@@ -772,27 +776,65 @@
   font-weight: bold;
 }
 
+/* For many years (7+), use smaller sizing */
+.yearly-chart.many-years {
+  gap: clamp(0.25rem, 1vw, 0.75rem);
+}
+
+.yearly-chart.many-years .year-bar {
+  max-width: 45px;
+}
+
+.yearly-chart.many-years .year-bar-fill {
+  padding-top: 4px;
+  min-height: 24px;
+}
+
+.yearly-chart.many-years .year-bar-count {
+  font-size: clamp(0.6rem, 1.5vw, 0.85rem);
+}
+
+.yearly-chart.many-years .year-label {
+  font-size: clamp(0.55rem, 1.5vw, 0.8rem);
+}
+
 @media (max-width: 480px) {
   .yearly-chart {
     height: 150px;
-    gap: 1rem;
+    gap: clamp(0.25rem, 1.5vw, 0.75rem);
     padding: 0.5rem;
   }
 
   .year-bar {
-    min-width: 40px;
+    max-width: 40px;
   }
 
   .year-bar-fill {
-    max-width: 40px;
-    padding-top: 6px;
+    padding-top: 4px;
+    min-height: 24px;
   }
 
   .year-bar-count {
-    font-size: 0.85rem;
+    font-size: clamp(0.6rem, 1.5vw, 0.8rem);
   }
 
   .year-label {
-    font-size: 0.85rem;
+    font-size: clamp(0.55rem, 1.5vw, 0.75rem);
+  }
+
+  .yearly-chart.many-years {
+    gap: clamp(0.15rem, 1vw, 0.5rem);
+  }
+
+  .yearly-chart.many-years .year-bar {
+    max-width: 32px;
+  }
+
+  .yearly-chart.many-years .year-bar-count {
+    font-size: clamp(0.5rem, 1.2vw, 0.7rem);
+  }
+
+  .yearly-chart.many-years .year-label {
+    font-size: clamp(0.5rem, 1.2vw, 0.65rem);
   }
 } 

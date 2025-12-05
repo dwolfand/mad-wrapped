@@ -152,7 +152,11 @@ const SlideShow = ({ stats, studioId }: SlideShowProps) => {
             content: (
               <>
                 <h2>Your MAD Journey</h2>
-                <div className="yearly-chart">
+                <div
+                  className={`yearly-chart ${
+                    stats.classesByYear.length >= 7 ? "many-years" : ""
+                  }`}
+                >
                   {stats.classesByYear.map((yearData, index) => {
                     const maxCount = Math.max(
                       ...stats.classesByYear.map((y) => y.count)

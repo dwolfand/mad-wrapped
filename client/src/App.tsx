@@ -9,7 +9,7 @@ import "./App.css";
 // API URL based on environment
 const API_BASE_URL = import.meta.env.PROD
   ? "https://api.madwrapped.com" // Production URL
-  : "http://localhost:8080/dev"; // Development URL
+  : "http://localhost:8280/dev"; // Development URL
 
 // Helper function to format the date
 const formatMemberSince = (dateStr: string | null) => {
