@@ -7,13 +7,16 @@ import {
   MONTHS,
   parseName,
 } from "./statsTypes";
+import { timedClientQuery } from "../queryTimer";
 
 export async function computeClientStats(
   client: any,
   clientId: string
 ): Promise<ClientStatsResult | null> {
   // First get client info (needed to get dupont_location_id)
-  const clientInfoResult = await client.query(
+  const clientInfoResult = await timedClientQuery(
+    client,
+    "client_info_lookup",
     `
       SELECT id, location, dupont_location_id, name, email, created_at
       FROM clients
@@ -32,7 +35,9 @@ export async function computeClientStats(
   const dupontLocationId = clientInfo.dupont_location_id;
 
   // Combined CTE query for all per-client stats
-  const combinedResult = await client.query(
+  const combinedResult = await timedClientQuery(
+    client,
+    "client_combined_stats",
     `
       WITH 
       -- Base visits for this client in the year

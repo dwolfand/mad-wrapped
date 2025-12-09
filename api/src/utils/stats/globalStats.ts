@@ -5,12 +5,27 @@ import {
   YEAR_START,
   YEAR_END,
 } from "./statsTypes";
+import { timedClientQuery } from "../queryTimer";
+
+// Cache for global stats - these are the same for all users
+let globalStatsCache: GlobalStatsResult | null = null;
+let globalStatsCacheTime: number = 0;
+const GLOBAL_STATS_CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
 
 export async function computeGlobalStats(
   client: any
 ): Promise<GlobalStatsResult> {
+  // Check cache first - global stats are the same for everyone
+  const now = Date.now();
+  if (globalStatsCache && (now - globalStatsCacheTime) < GLOBAL_STATS_CACHE_TTL_MS) {
+    console.log("⚡ Using cached global stats");
+    return globalStatsCache;
+  }
+
   // Combined query for all global stats
-  const globalResult = await client.query(
+  const globalResult = await timedClientQuery(
+    client,
+    "global_stats",
     `
       WITH 
       -- Base filtered visits
@@ -91,7 +106,7 @@ export async function computeGlobalStats(
   const totalMembers = parseInt(row.total_members || "0");
   const totalClasses = parseInt(row.total_classes || "0");
 
-  return {
+  const result: GlobalStatsResult = {
     totalMembers,
     totalClasses,
     averageClassesPerMember: totalMembers > 0 ? totalClasses / totalMembers : 0,
@@ -100,4 +115,11 @@ export async function computeGlobalStats(
     mostPopularCoach: row.most_popular_coach || "Unknown",
     averageEarlyBirdScore: parseInt(row.avg_early_bird_score || "0"),
   };
+
+  // Update cache
+  globalStatsCache = result;
+  globalStatsCacheTime = Date.now();
+  console.log("📦 Cached global stats");
+
+  return result;
 }

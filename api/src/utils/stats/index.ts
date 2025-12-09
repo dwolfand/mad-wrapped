@@ -14,6 +14,7 @@ export async function computeStatsForClient(
   studioId: string
 ): Promise<StatsResult | null> {
   const dbClient = await pool.connect();
+  const operationStart = performance.now();
 
   try {
     // First, get client stats (includes client info lookup)
@@ -29,6 +30,11 @@ export async function computeStatsForClient(
       computePeerStats(dbClient, clientId),
       computeGlobalStats(dbClient),
     ]);
+
+    const totalDuration = Math.round(performance.now() - operationStart);
+    console.log(
+      `⏱️ Total stats computation for ${clientId}: ${totalDuration}ms`
+    );
 
     return {
       clientId,

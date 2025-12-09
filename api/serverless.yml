@@ -59,7 +59,7 @@ functions:
   api:
     handler: src/handler.handler
     timeout: 30
-    memorySize: 512
+    memorySize: 1024
     events:
       - http:
           path: /api/stats/{clientId}/{studioId}
