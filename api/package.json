@@ -11,6 +11,7 @@
     "deploy:prod": "serverless deploy --stage production --aws-profile personal --verbose",
     "deploy-ci": "serverless deploy --stage production --verbose",
     "send-emails": "ts-node src/scripts/send_emails.ts",
+    "send-notifications": "ts-node src/scripts/send_notifications.ts",
     "test-puppeteer": "ts-node src/test-puppeteer.ts"
   },
   "dependencies": {
@@ -30,7 +31,8 @@
     "puppeteer": "^24.31.0",
     "puppeteer-core": "^22.12.1",
     "serverless-http": "^3.1.1",
-    "superagent": "^10.2.3"
+    "superagent": "^10.2.3",
+    "twilio": "^5.11.1"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.159",

@@ -87,7 +87,7 @@ export async function sendStatsLinkEmail({
   clientId,
   studioId,
 }: StatsLinkEmailData) {
-  const statsUrl = `https://madwrapped.com/?clientId=${clientId}`;
+  const statsUrl = `https://madwrapped.com/?clientId=${clientId}&year=2025`;
 
   const command = new SendEmailCommand({
     Source: "MAD Wrapped <no-reply@madwrapped.com>",
