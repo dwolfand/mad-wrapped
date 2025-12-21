@@ -12,6 +12,9 @@ let globalStatsCache: GlobalStatsResult | null = null;
 let globalStatsCacheTime: number = 0;
 const GLOBAL_STATS_CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
 
+// Materialized view staleness threshold - if older than this, fall back to live query
+const MV_STALENESS_THRESHOLD_MS = 24 * 60 * 60 * 1000; // 24 hours
+
 export async function computeGlobalStats(
   client: any
 ): Promise<GlobalStatsResult> {
@@ -22,10 +25,96 @@ export async function computeGlobalStats(
     return globalStatsCache;
   }
 
+  // Try to use materialized view first
+  const mvResult = await tryGetGlobalStatsFromMaterializedView(client);
+  if (mvResult) {
+    globalStatsCache = mvResult;
+    globalStatsCacheTime = Date.now();
+    return mvResult;
+  }
+
+  // Fall back to live query
+  return computeGlobalStatsLive(client);
+}
+
+/**
+ * Try to get global stats from materialized view
+ * Returns null if view doesn't exist, is empty, or is too stale
+ */
+async function tryGetGlobalStatsFromMaterializedView(
+  client: any
+): Promise<GlobalStatsResult | null> {
+  try {
+    const result = await timedClientQuery(
+      client,
+      "global_stats_mv",
+      `
+        SELECT 
+          total_members,
+          total_classes,
+          most_popular_time_slot,
+          most_popular_day,
+          most_popular_coach,
+          avg_early_bird_score,
+          computed_at
+        FROM mv_global_stats
+        LIMIT 1
+      `,
+      []
+    );
+
+    if (result.rows.length === 0) {
+      console.log("⚠️ Global stats materialized view is empty, falling back to live query");
+      return null;
+    }
+
+    const row = result.rows[0];
+    const computedAt = new Date(row.computed_at).getTime();
+    const age = Date.now() - computedAt;
+
+    if (age > MV_STALENESS_THRESHOLD_MS) {
+      console.log(`⚠️ Global stats materialized view is stale (${Math.round(age / 1000 / 60 / 60)}h old), falling back to live query`);
+      return null;
+    }
+
+    console.log(`✅ Using global stats from materialized view (${Math.round(age / 1000 / 60)}m old)`);
+
+    const totalMembers = parseInt(row.total_members || "0");
+    const totalClasses = parseInt(row.total_classes || "0");
+
+    return {
+      totalMembers,
+      totalClasses,
+      averageClassesPerMember: totalMembers > 0 ? totalClasses / totalMembers : 0,
+      mostPopularTimeSlot: row.most_popular_time_slot || "07:30 AM",
+      mostPopularDay: row.most_popular_day?.trim() || "Monday",
+      mostPopularCoach: row.most_popular_coach || "Unknown",
+      averageEarlyBirdScore: parseInt(row.avg_early_bird_score || "0"),
+    };
+  } catch (error: any) {
+    // If materialized view doesn't exist yet, fall back gracefully
+    if (error.code === '42P01') { // undefined_table
+      console.log("ℹ️ Global stats materialized view not found, using live query");
+      return null;
+    }
+    console.error("Error querying global stats materialized view:", error);
+    return null;
+  }
+}
+
+/**
+ * Compute global stats with live query (original implementation)
+ */
+async function computeGlobalStatsLive(
+  client: any
+): Promise<GlobalStatsResult> {
+
+  console.log("🔄 Computing global stats with live query");
+  
   // Combined query for all global stats
   const globalResult = await timedClientQuery(
     client,
-    "global_stats",
+    "global_stats_live",
     `
       WITH 
       -- Base filtered visits
@@ -119,7 +208,7 @@ export async function computeGlobalStats(
   // Update cache
   globalStatsCache = result;
   globalStatsCacheTime = Date.now();
-  console.log("📦 Cached global stats");
+  console.log("📦 Cached global stats from live query");
 
   return result;
 }
