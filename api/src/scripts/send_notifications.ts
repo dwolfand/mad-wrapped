@@ -110,7 +110,6 @@ async function getClientsToNotify(): Promise<any[]> {
       WHERE type = 'stats_lookup'
         AND status = 200
         AND client_id IS NOT NULL
-        AND true=false
     ),
     -- Recent notifications of this type
     recent_notifications AS (
