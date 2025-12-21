@@ -36,7 +36,8 @@ const TEST_USER_WHITELIST = {
 const NOTIFICATION_COOLDOWN_HOURS = 24;
 
 // Delay between notifications to avoid rate limits (milliseconds)
-const NOTIFICATION_DELAY_MS = 500;
+// Twilio has a 1 SMS/second rate limit, so we use 1000ms to be safe
+const NOTIFICATION_DELAY_MS = 1000;
 
 // Dry run mode - if true, only prints what would be sent without actually sending
 const DRY_RUN = process.env.DRY_RUN === "true";
