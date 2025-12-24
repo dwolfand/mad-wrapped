@@ -837,4 +837,24 @@
   .yearly-chart.many-years .year-label {
     font-size: clamp(0.5rem, 1.2vw, 0.65rem);
   }
+}
+
+/* Page URL */
+.page-url {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  opacity: 0.6;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  font-family: "Rubik", -apple-system, BlinkMacSystemFont, sans-serif;
+  user-select: none;
+}
+
+@media (max-width: 480px) {
+  .page-url {
+    font-size: 0.65rem;
+    margin-top: 0.75rem;
+  }
 } 

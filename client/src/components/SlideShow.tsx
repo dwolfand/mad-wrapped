@@ -771,6 +771,8 @@ const SlideShow = ({ stats, studioId }: SlideShowProps) => {
           />
         ))}
       </motion.div>
+
+      <div className="page-url">MADwrapped.com</div>
     </div>
   );
 };
