@@ -77,6 +77,10 @@ functions:
           path: /api/notify-request
           method: post
           cors: true
+      - http:
+          path: /api/analytics
+          method: post
+          cors: true
 
   scraper:
     handler: src/scraper-handler.handler

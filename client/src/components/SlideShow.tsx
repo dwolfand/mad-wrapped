@@ -10,6 +10,11 @@ import "./SlideShow.css";
 import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import Confetti from "react-confetti";
+import {
+  trackSlideshowOpened,
+  trackSlideshowCompleted,
+  trackSlideView,
+} from "../utils/trackAnalytics";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -242,10 +247,19 @@ const SlideShow = ({ stats, studioId }: SlideShowProps) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [dragDirection, setDragDirection] = useState<number>(0);
   const slideRef = useRef<HTMLDivElement>(null);
+  const startTimeRef = useRef<number>(Date.now());
+  const slideStartTimeRef = useRef<number>(Date.now());
+  const hasTrackedCompletionRef = useRef(false);
   const swipeConfidenceThreshold = 50;
 
-  // Track slide view in GA4
-  const trackSlideView = useCallback(
+  // Track slideshow opened on mount
+  useEffect(() => {
+    trackSlideshowOpened(stats.clientId, studioId, stats.firstName);
+    startTimeRef.current = Date.now();
+  }, [stats.clientId, studioId, stats.firstName]);
+
+  // Track slide view in GA4 and our backend
+  const trackSlideViewGA4 = useCallback(
     (slideId: string) => {
       window.gtag?.("event", "page_view", {
         page_title: `MAD Wrapped - ${slideId}`,
@@ -259,20 +273,56 @@ const SlideShow = ({ stats, studioId }: SlideShowProps) => {
   );
 
   const paginate = (direction: number) => {
+    // Track slide duration before moving
+    const duration = Date.now() - slideStartTimeRef.current;
+    if (slides[currentSlide]) {
+      trackSlideView(
+        stats.clientId,
+        studioId,
+        currentSlide,
+        slides[currentSlide].id,
+        duration
+      );
+    }
+
     setCurrentSlide((prev) => {
       const nextSlide = prev + direction;
       if (nextSlide < 0) return slides.length - 1;
       if (nextSlide >= slides.length) return 0;
       return nextSlide;
     });
+
+    // Reset slide start time
+    slideStartTimeRef.current = Date.now();
   };
 
-  // Track slide changes
+  // Track slide changes in GA4 and check for completion
   useEffect(() => {
     if (slides[currentSlide]) {
-      trackSlideView(slides[currentSlide].id);
+      trackSlideViewGA4(slides[currentSlide].id);
+
+      // Check if user reached the last slide
+      if (
+        currentSlide === slides.length - 1 &&
+        !hasTrackedCompletionRef.current
+      ) {
+        const timeSpent = Date.now() - startTimeRef.current;
+        trackSlideshowCompleted(
+          stats.clientId,
+          studioId,
+          stats.firstName,
+          timeSpent
+        );
+        hasTrackedCompletionRef.current = true;
+      }
     }
-  }, [currentSlide, trackSlideView]);
+  }, [
+    currentSlide,
+    trackSlideViewGA4,
+    stats.clientId,
+    studioId,
+    stats.firstName,
+  ]);
 
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
     if (event.key === "ArrowLeft") {

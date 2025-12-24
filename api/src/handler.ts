@@ -7,6 +7,7 @@ import { ProfilingIntegration } from "@sentry/profiling-node";
 import { getStats } from "./handlers/stats";
 import { lookupEmail, requestNotification } from "./handlers/email";
 import { healthCheck } from "./handlers/health";
+import { trackAnalytics } from "./handlers/analytics";
 
 // Load environment variables
 dotenv.config();
@@ -48,6 +49,7 @@ app.use(express.json());
 app.get("/api/stats/:clientId/:studioId", getStats);
 app.post("/api/lookup", lookupEmail);
 app.post("/api/notify-request", requestNotification);
+app.post("/api/analytics", trackAnalytics);
 app.get("/api/health", healthCheck);
 
 // Only set up Sentry error handler if DSN is provided

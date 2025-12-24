@@ -9,6 +9,9 @@ type LogType =
   | "sms_sent"
   | "sms_failed"
   | "stats_not_found"
+  | "slideshow_opened"
+  | "slideshow_completed"
+  | "slide_view"
   | "error";
 
 export interface ActivityLogData {
@@ -25,6 +28,7 @@ export interface ActivityLogData {
   userAgent?: string;
   status?: number;
   error?: any;
+  metadata?: Record<string, any>;
 }
 
 export async function logActivity(data: ActivityLogData) {
@@ -45,9 +49,9 @@ export async function logActivity(data: ActivityLogData) {
       `
       INSERT INTO logs (
         type, email, phone, first_name, last_name, client_id, studio_id, 
-        studio, is_custom_studio, ip, user_agent, status, error, stage
+        studio, is_custom_studio, ip, user_agent, status, error, stage, metadata
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
       `,
       [
         data.type,
@@ -64,6 +68,7 @@ export async function logActivity(data: ActivityLogData) {
         data.status || null,
         errorMessage,
         stage,
+        data.metadata ? JSON.stringify(data.metadata) : null,
       ]
     );
   } catch (error) {
