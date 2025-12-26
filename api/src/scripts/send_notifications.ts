@@ -37,7 +37,7 @@ const NOTIFICATION_COOLDOWN_HOURS = 24;
 
 // Delay between notifications to avoid rate limits (milliseconds)
 // Twilio has a 1 SMS/second rate limit, so we use 1000ms to be safe
-const NOTIFICATION_DELAY_MS = 1000;
+const NOTIFICATION_DELAY_MS = 500;
 
 // Dry run mode - if true, only prints what would be sent without actually sending
 const DRY_RUN = process.env.DRY_RUN === "true";
@@ -101,7 +101,6 @@ async function getClientsToNotify(): Promise<any[]> {
         AND NOT v.missed
         ${NOTIFICATION_TYPE === "email" ? "AND c.email IS NOT NULL" : ""}
         ${NOTIFICATION_TYPE === "sms" ? "AND c.phone IS NOT NULL" : ""}
-        AND c.dupont_location_id = '100003434'
     ),
     -- Clients who have viewed their stats
     viewed_stats AS (
@@ -274,7 +273,7 @@ async function sendNotifications() {
     const clients = await getClientsToNotify();
 
     // Filter to test users only
-    const testClients = clients.filter(isTestUser);
+    const testClients = clients; //.filter(isTestUser);
     const skippedCount = clients.length - testClients.length;
 
     console.log(`📊 Results:`);
