@@ -4,6 +4,7 @@ type LogType =
   | "notification_request"
   | "stats_lookup"
   | "email_lookup"
+  | "email_lookup_unsupported_location"
   | "email_sent"
   | "email_failed"
   | "unsupported_location_email_sent"

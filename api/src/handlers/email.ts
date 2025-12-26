@@ -119,24 +119,36 @@ export async function lookupEmail(req: Request, res: Response) {
     const clientId = client.dupont_location_id || client.id;
     const locationSupported = await isClientLocationSupported(clientId);
 
-    // Send appropriate email based on location support
-    if (locationSupported) {
-      await sendStatsLinkEmail({
-        email: client.email,
-        firstName,
+    if (!locationSupported) {
+      // Return immediately for unsupported locations - no email needed
+      await logActivity({
+        type: "email_lookup_unsupported_location",
         clientId,
         studioId: client.location,
+        ip,
+        userAgent,
+        status: 200,
+        email,
       });
-    } else {
-      await sendUnsupportedLocationEmail({
-        email: client.email,
+
+      return res.json({
+        message:
+          "Your location's 2025 Wrapped is not available at this time. Keep crushing it at MADabolic! 💪",
         firstName,
-        locationName: client.location,
+        locationSupported: false,
       });
     }
 
+    // Send email with stats link for supported locations
+    await sendStatsLinkEmail({
+      email: client.email,
+      firstName,
+      clientId,
+      studioId: client.location,
+    });
+
     await logActivity({
-      type: locationSupported ? "email_lookup" : "email_lookup",
+      type: "email_lookup",
       clientId,
       studioId: client.location,
       ip,
@@ -148,6 +160,7 @@ export async function lookupEmail(req: Request, res: Response) {
     res.json({
       message: "Check your email for a link to your year in review!",
       firstName,
+      locationSupported: true,
     });
   } catch (error) {
     console.error("Error processing email lookup:", error);
