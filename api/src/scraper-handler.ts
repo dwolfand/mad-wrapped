@@ -140,17 +140,31 @@ export const handler: Handler<ScraperEvent, ScraperResponse> = async (
           .replace(/\b\w/g, (c: string) => c.toUpperCase()) || "";
     }
 
-    // Send email with stats link
+    // Send email with stats link or unsupported location message
     try {
-      await sendStatsLinkEmail({
-        email: userData.client.email,
-        firstName,
-        clientId: userData.client.dupontLocationId || userData.client.id,
-        studioId: userData.client.location,
-      });
-      console.log(`📧 Stats link email sent to: ${email}`);
+      const clientId = userData.client.dupontLocationId || userData.client.id;
+      const locationSupported = await isClientLocationSupported(clientId);
+
+      if (locationSupported) {
+        // Send regular stats email for supported locations
+        await sendStatsLinkEmail({
+          email: userData.client.email,
+          firstName,
+          clientId,
+          studioId: userData.client.location,
+        });
+        console.log(`📧 Stats link email sent to: ${email}`);
+      } else {
+        // Send unsupported location email
+        await sendUnsupportedLocationEmail({
+          email: userData.client.email,
+          firstName,
+          locationName: userData.client.location,
+        });
+        console.log(`📧 Unsupported location email sent to: ${email}`);
+      }
     } catch (emailError) {
-      console.error("Error sending stats link email:", emailError);
+      console.error("Error sending email:", emailError);
       // Don't fail the whole scrape if email fails
     }
 

@@ -6,6 +6,7 @@ type LogType =
   | "email_lookup"
   | "email_sent"
   | "email_failed"
+  | "unsupported_location_email_sent"
   | "sms_sent"
   | "sms_failed"
   | "stats_not_found"

@@ -81,6 +81,73 @@ export async function sendAdminNotification({
   }
 }
 
+export async function sendUnsupportedLocationEmail({
+  email,
+  firstName,
+  locationName,
+}: {
+  email: string;
+  firstName: string;
+  locationName: string;
+}) {
+  const command = new SendEmailCommand({
+    Source: "MAD Wrapped <no-reply@madwrapped.com>",
+    Destination: {
+      ToAddresses: [email],
+      BccAddresses: [process.env.ADMIN_EMAIL!],
+    },
+    Message: {
+      Subject: {
+        Data: "About Your MAD Wrapped 2025",
+      },
+      Body: {
+        Html: {
+          Data: `
+            <!DOCTYPE html>
+            <html>
+              <head>
+                <meta charset="utf-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              </head>
+              <body style="margin: 0; padding: 0;">
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                  <div style="text-align: center; padding: 20px;">
+                    <img src="https://madwrapped.com/images/email/mad_logo.png" 
+                         alt="MADabolic" 
+                         style="width: 200px; height: auto;" />
+                  </div>
+                  <div style="padding: 40px 20px;">
+                    <h1 style="margin: 0 0 20px 0;">Hi ${firstName}! 👋</h1>
+                    <p style="margin: 0 0 20px 0;">Thank you for your interest in MAD Wrapped!</p>
+                    <p style="margin: 0 0 20px 0;">Unfortunately, your 2025 Wrapped stats for ${locationName.replace(
+                      "MADabolic ",
+                      ""
+                    )} are not available at this time.</p>
+                    <p style="margin: 0 0 20px 0;">We appreciate your understanding and look forward to celebrating your achievements with you in the future!</p>
+                    <p style="margin: 0;">Keep crushing it at MADabolic! 💪</p>
+                    <hr style="margin: 30px 0; border: none; height: 1px; background-color: rgba(0, 0, 0, 0.1);">
+                    <p style="color: #888888; font-size: 12px; margin: 0;">
+                      This email was sent by MAD Wrapped. If you have questions, please contact your local MADabolic.
+                    </p>
+                  </div>
+                </div>
+              </body>
+            </html>
+          `,
+        },
+      },
+    },
+  });
+
+  try {
+    await ses.send(command);
+    return true;
+  } catch (error) {
+    console.error("Error sending unsupported location email:", error);
+    throw error;
+  }
+}
+
 export async function sendStatsLinkEmail({
   email,
   firstName,

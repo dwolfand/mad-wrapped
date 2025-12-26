@@ -2,9 +2,14 @@ import { Request, Response } from "express";
 import * as Sentry from "@sentry/node";
 import { pool } from "../utils/postgres";
 import { logActivity } from "../utils/logger";
-import { sendStatsLinkEmail, sendAdminNotification } from "../utils/email";
+import {
+  sendStatsLinkEmail,
+  sendAdminNotification,
+  sendUnsupportedLocationEmail,
+} from "../utils/email";
 import { getStudioShortName } from "../utils/studios";
 import { Lambda } from "@aws-sdk/client-lambda";
+import { isClientLocationSupported } from "../utils/locationSupport";
 
 const stage = process.env.STAGE || "dev";
 
@@ -110,17 +115,29 @@ export async function lookupEmail(req: Request, res: Response) {
           .replace(/\b\w/g, (c: string) => c.toUpperCase()) || "";
     }
 
-    // Send email with stats link using dupont_location_id
-    await sendStatsLinkEmail({
-      email: client.email,
-      firstName,
-      clientId: client.dupont_location_id || client.id,
-      studioId: client.location,
-    });
+    // Check if client's favorite location is supported
+    const clientId = client.dupont_location_id || client.id;
+    const locationSupported = await isClientLocationSupported(clientId);
+
+    // Send appropriate email based on location support
+    if (locationSupported) {
+      await sendStatsLinkEmail({
+        email: client.email,
+        firstName,
+        clientId,
+        studioId: client.location,
+      });
+    } else {
+      await sendUnsupportedLocationEmail({
+        email: client.email,
+        firstName,
+        locationName: client.location,
+      });
+    }
 
     await logActivity({
-      type: "email_lookup",
-      clientId: client.dupont_location_id || client.id,
+      type: locationSupported ? "email_lookup" : "email_lookup",
+      clientId,
       studioId: client.location,
       ip,
       userAgent,
