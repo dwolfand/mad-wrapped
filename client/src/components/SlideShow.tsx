@@ -18,16 +18,13 @@ import {
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-// Supported locations for 2025 wrapped (DMV and Charlotte areas)
+// Supported locations for 2025 wrapped (DMV area only)
 const SUPPORTED_LOCATIONS = [
   "MADabolic 14th street",
   "MADabolic Alexandria",
   "MADabolic Arlington",
   "MADabolic Dupont",
   "MADabolic H Street",
-  "MADabolic Elizabeth",
-  "MADabolic NoDa",
-  "MADabolic South End",
 ];
 
 // Helper to check if a location is supported

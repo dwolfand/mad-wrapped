@@ -1,6 +1,6 @@
 import { pool } from "./postgres";
 
-// Supported locations for 2025 wrapped (DMV and Charlotte areas)
+// Supported locations for 2025 wrapped (DMV area only)
 // These locations have accurate data and will receive the full wrapped experience
 const SUPPORTED_LOCATIONS = [
   "MADabolic 14th street",
@@ -8,9 +8,6 @@ const SUPPORTED_LOCATIONS = [
   "MADabolic Arlington",
   "MADabolic Dupont",
   "MADabolic H Street",
-  "MADabolic Elizabeth",
-  "MADabolic NoDa",
-  "MADabolic South End",
 ];
 
 /**
