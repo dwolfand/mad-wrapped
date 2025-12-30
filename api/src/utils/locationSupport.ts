@@ -14,7 +14,9 @@ const SUPPORTED_LOCATIONS = [
  * Check if a location is supported for full wrapped experience
  */
 export function isLocationSupported(location: string): boolean {
-  return SUPPORTED_LOCATIONS.includes(location);
+  // Trim whitespace to handle database inconsistencies
+  const trimmedLocation = location.trim();
+  return SUPPORTED_LOCATIONS.includes(trimmedLocation);
 }
 
 /**
@@ -46,7 +48,8 @@ export async function getClientFavoriteLocation(
       return null;
     }
 
-    return result.rows[0].location_name;
+    // Trim whitespace from location name to handle database inconsistencies
+    return result.rows[0].location_name.trim();
   } catch (error) {
     console.error(
       `Error getting favorite location for client ${dupontLocationId}:`,
