@@ -14,6 +14,9 @@ type LogType =
   | "slideshow_opened"
   | "slideshow_completed"
   | "slide_view"
+  | "coach_stats_lookup"
+  | "coach_stats_not_found"
+  | "coach_list_fetch"
   | "error";
 
 export interface ActivityLogData {

@@ -81,6 +81,14 @@ functions:
           path: /api/analytics
           method: post
           cors: true
+      - http:
+          path: /api/coach-stats/{firstName}/{lastName}
+          method: get
+          cors: true
+      - http:
+          path: /api/coaches
+          method: get
+          cors: true
 
   scraper:
     handler: src/scraper-handler.handler

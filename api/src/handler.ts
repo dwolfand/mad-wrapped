@@ -8,6 +8,7 @@ import { getStats } from "./handlers/stats";
 import { lookupEmail, requestNotification } from "./handlers/email";
 import { healthCheck } from "./handlers/health";
 import { trackAnalytics } from "./handlers/analytics";
+import { getCoachStats, getCoachList } from "./handlers/coachStats";
 
 // Load environment variables
 dotenv.config();
@@ -51,6 +52,8 @@ app.post("/api/lookup", lookupEmail);
 app.post("/api/notify-request", requestNotification);
 app.post("/api/analytics", trackAnalytics);
 app.get("/api/health", healthCheck);
+app.get("/api/coach-stats/:firstName/:lastName", getCoachStats);
+app.get("/api/coaches", getCoachList);
 
 // Only set up Sentry error handler if DSN is provided
 if (process.env.SENTRY_DSN) {

@@ -387,3 +387,427 @@ body::after {
   height: auto;
   margin-bottom: 20px;
 }
+
+/* Coach link button on main page */
+.coach-link-btn {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(135deg, var(--mad-green), var(--mad-light-green));
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+.coach-link-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(6, 199, 166, 0.4);
+}
+
+.student-link-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid var(--mad-fade-green);
+  border-radius: 12px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 1.5rem;
+}
+
+.student-link-btn:hover {
+  background: var(--mad-fade-green);
+  border-color: var(--mad-green);
+  transform: translateX(-2px);
+}
+
+/* Coach-specific styles */
+.coach-search-input {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1rem;
+  border: 2px solid var(--mad-fade-green);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+.coach-search-input:focus {
+  outline: none;
+  border-color: var(--mad-green);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.coach-search-input::placeholder {
+  color: var(--text-secondary);
+}
+
+.search-container {
+  position: relative;
+  width: 100%;
+}
+
+.coach-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: rgba(18, 18, 18, 0.98);
+  border: 2px solid var(--mad-fade-green);
+  border-radius: 12px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  margin-top: 0.5rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.coach-dropdown-item {
+  padding: 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
+}
+
+.coach-dropdown-item:hover {
+  background: var(--mad-fade-green);
+}
+
+.coach-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.coach-dropdown-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.coach-dropdown-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.coach-dropdown-count {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.no-results {
+  text-align: center;
+  color: var(--text-secondary);
+  padding: 1rem;
+  font-size: 0.9rem;
+}
+
+.popular-coaches {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.popular-coach-btn {
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid var(--mad-fade-green);
+  border-radius: 12px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.popular-coach-btn:hover {
+  background: var(--mad-fade-green);
+  border-color: var(--mad-green);
+  transform: translateY(-2px);
+}
+
+.back-to-search-btn {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  padding: 0.75rem 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid var(--mad-fade-green);
+  border-radius: 12px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 100;
+}
+
+.back-to-search-btn:hover {
+  background: var(--mad-fade-green);
+  border-color: var(--mad-green);
+  transform: translateX(-2px);
+}
+
+/* Coach slide-specific styles */
+.badges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.badge-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid var(--mad-fade-green);
+  border-radius: 16px;
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.badge-card:hover {
+  background: var(--mad-fade-green);
+  transform: translateY(-5px);
+}
+
+.badge-emoji {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.badge-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--mad-green);
+  margin-bottom: 0.5rem;
+}
+
+.badge-description {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.class-types-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.class-type-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid var(--mad-fade-green);
+  border-radius: 16px;
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.class-type-card:hover {
+  background: var(--mad-fade-green);
+  transform: scale(1.05);
+}
+
+.class-type-emoji {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.class-type-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.class-type-count {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--mad-green);
+  margin-bottom: 0.25rem;
+}
+
+.class-type-percentage {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.top-students-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.student-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid var(--mad-fade-green);
+  border-radius: 12px;
+  padding: 1rem;
+  transition: all 0.3s ease;
+}
+
+.student-card:hover {
+  background: var(--mad-fade-green);
+  transform: translateX(10px);
+}
+
+.student-rank {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--mad-green);
+  min-width: 40px;
+  text-align: center;
+}
+
+.student-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.student-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.student-count {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.location-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.location-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.location-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.location-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.location-count {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--mad-dark-green), var(--mad-green), var(--mad-light-green));
+  transition: width 0.5s ease;
+}
+
+.stat-number-text {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--mad-green);
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.recap-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.recap-stat {
+  text-align: center;
+}
+
+.recap-number {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--mad-green);
+  margin-bottom: 0.5rem;
+}
+
+.recap-label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.final-message {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid var(--mad-fade-green);
+  border-radius: 16px;
+  text-align: center;
+}
+
+.final-message p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.final-emoji {
+  font-size: 2rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+  .badges-grid,
+  .class-types-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .popular-coaches {
+    grid-template-columns: 1fr;
+  }
+
+  .recap-stats {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .back-to-search-btn {
+    top: 10px;
+    left: 10px;
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+}
