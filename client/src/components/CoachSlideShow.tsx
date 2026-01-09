@@ -390,18 +390,17 @@ const CoachSlideShow = ({ stats }: CoachSlideShowProps) => {
   });
 
   const paginate = (newDirection: number) => {
-    const slideViewDuration = Date.now() - slideStartTimeRef.current;
-
-    // Track slide view
-    if (currentSlide < slides.length) {
-      // trackSlideView(
-      //   stats.coachFullName,
-      //   "coach",
-      //   currentSlide,
-      //   slides[currentSlide].title,
-      //   slideViewDuration
-      // );
-    }
+    // Track slide view (commented out for now)
+    // const slideViewDuration = Date.now() - slideStartTimeRef.current;
+    // if (currentSlide < slides.length) {
+    //   trackSlideView(
+    //     stats.coachFullName,
+    //     "coach",
+    //     currentSlide,
+    //     slides[currentSlide].title,
+    //     slideViewDuration
+    //   );
+    // }
 
     slideStartTimeRef.current = Date.now();
 
@@ -411,20 +410,20 @@ const CoachSlideShow = ({ stats }: CoachSlideShowProps) => {
       setCurrentSlide(currentSlide - 1);
     }
 
-    // Track completion on last slide
+    // Track completion on last slide (commented out for now)
     if (
       newDirection === 1 &&
       currentSlide === slides.length - 1 &&
       !hasTrackedCompletionRef.current
     ) {
-      const totalDuration = Date.now() - startTimeRef.current;
+      // const totalDuration = Date.now() - startTimeRef.current;
       // trackSlideshowCompleted(stats.coachFullName, "coach", totalDuration);
       hasTrackedCompletionRef.current = true;
     }
   };
 
   const handleDragEnd = (
-    event: MouseEvent | TouchEvent | PointerEvent,
+    _event: MouseEvent | TouchEvent | PointerEvent,
     info: PanInfo
   ) => {
     const swipe = Math.abs(info.offset.x);
@@ -440,7 +439,7 @@ const CoachSlideShow = ({ stats }: CoachSlideShowProps) => {
   };
 
   const handleDrag = (
-    event: MouseEvent | TouchEvent | PointerEvent,
+    _event: MouseEvent | TouchEvent | PointerEvent,
     info: PanInfo
   ) => {
     setDragDirection(info.offset.x > 0 ? -1 : 1);
