@@ -78,7 +78,8 @@ export async function computeCoachStats(
           class_date,
           class_time,
           location_name,
-          COUNT(DISTINCT client_dupont_location_id) as class_size
+          COUNT(DISTINCT client_dupont_location_id) as class_size,
+          MAX(num_mins) as class_duration_mins
         FROM visits
         WHERE trainer_first_name = $1
           AND trainer_last_name = $2
@@ -102,7 +103,7 @@ export async function computeCoachStats(
         (SELECT COUNT(*) FROM class_sessions) as total_classes,
         COUNT(DISTINCT av.client_dupont_location_id) as unique_students,
         COUNT(*) as total_student_visits,
-        SUM(av.num_mins) / 60.0 as total_teaching_hours,
+        (SELECT SUM(class_duration_mins) / 60.0 FROM class_sessions) as total_teaching_hours,
         MIN(av.class_date) as first_class_date,
         AVG(cs.class_size) as average_class_size
       FROM all_visits av
