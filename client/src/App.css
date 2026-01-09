@@ -410,16 +410,18 @@ body::after {
 
 .student-link-btn {
   width: 100%;
-  padding: 0.75rem;
+  padding: 0.75rem 1rem;
   background: rgba(255, 255, 255, 0.05);
   border: 2px solid var(--mad-fade-green);
   border-radius: 12px;
   color: var(--text-primary);
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .student-link-btn:hover {
@@ -431,7 +433,7 @@ body::after {
 /* Coach-specific styles */
 .coach-search-input {
   width: 100%;
-  padding: 1rem;
+  padding: 0.875rem 1rem;
   font-size: 1rem;
   border: 2px solid var(--mad-fade-green);
   border-radius: 12px;
@@ -439,6 +441,8 @@ body::after {
   color: var(--text-primary);
   transition: all 0.3s ease;
   margin-bottom: 1rem;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .coach-search-input:focus {
@@ -454,6 +458,7 @@ body::after {
 .search-container {
   position: relative;
   width: 100%;
+  margin-bottom: 1rem;
 }
 
 .coach-dropdown {
@@ -512,22 +517,24 @@ body::after {
 
 .popular-coaches {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
   width: 100%;
   margin-top: 1rem;
 }
 
 .popular-coach-btn {
-  padding: 1rem;
+  padding: 0.875rem 0.75rem;
   background: rgba(255, 255, 255, 0.05);
   border: 2px solid var(--mad-fade-green);
   border-radius: 12px;
   color: var(--text-primary);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
+  word-break: break-word;
+  text-align: center;
 }
 
 .popular-coach-btn:hover {
@@ -789,7 +796,27 @@ body::after {
   margin-top: 1rem;
 }
 
+/* Mobile-specific container fixes */
+.welcome-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.form-container {
+  width: 100%;
+  max-width: 100%;
+}
+
 @media (max-width: 768px) {
+  .welcome-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .form-container {
+    padding: 0;
+  }
+
   .badges-grid,
   .class-types-grid {
     grid-template-columns: 1fr;
@@ -797,6 +824,12 @@ body::after {
 
   .popular-coaches {
     grid-template-columns: 1fr;
+    gap: 0.625rem;
+  }
+
+  .popular-coach-btn {
+    padding: 0.875rem;
+    font-size: 0.9rem;
   }
 
   .recap-stats {
@@ -809,5 +842,46 @@ body::after {
     left: 10px;
     padding: 0.5rem 1rem;
     font-size: 0.8rem;
+  }
+
+  .coach-search-input {
+    font-size: 1rem;
+    padding: 0.875rem;
+  }
+
+  .student-link-btn {
+    font-size: 0.875rem;
+    padding: 0.75rem;
+  }
+
+  .welcome-title {
+    font-size: 1.75rem;
+    line-height: 1.2;
+  }
+
+  .welcome-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .welcome-logo {
+    max-width: 250px;
+    height: auto;
+  }
+
+  .info-text {
+    font-size: 0.85rem;
+  }
+
+  .info-text p {
+    margin: 0.5rem 0;
+  }
+
+  .divider {
+    margin: 1.25rem 0;
+    font-size: 0.85rem;
+  }
+
+  .coach-dropdown {
+    max-height: 250px;
   }
 }
