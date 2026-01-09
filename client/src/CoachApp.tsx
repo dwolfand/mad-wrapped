@@ -18,7 +18,10 @@ function CoachApp() {
 
   // Load coach stats from query parameters on mount
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
+    // Get query params from hash URL
+    const hash = window.location.hash;
+    const queryString = hash.includes("?") ? hash.split("?")[1] : "";
+    const params = new URLSearchParams(queryString);
     const firstName = params.get("firstName");
     const lastName = params.get("lastName");
 
@@ -26,7 +29,7 @@ function CoachApp() {
       fetchCoachStats(firstName, lastName);
     } else {
       // No query params, redirect to search page
-      window.location.href = "/coach-search";
+      window.location.hash = "#/coach-search";
     }
   }, []);
 

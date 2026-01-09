@@ -4,28 +4,32 @@ import CoachApp from "./CoachApp";
 import CoachSearch from "./CoachSearch";
 
 function Router() {
-  const [currentPath, setCurrentPath] = useState(window.location.pathname);
+  // Use hash for routing (GitHub Pages compatible)
+  const [currentHash, setCurrentHash] = useState(window.location.hash);
 
   useEffect(() => {
-    // Handle browser back/forward buttons
-    const handlePopState = () => {
-      setCurrentPath(window.location.pathname);
+    // Handle hash changes
+    const handleHashChange = () => {
+      setCurrentHash(window.location.hash);
     };
 
-    window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
   }, []);
 
-  // Simple routing based on path
-  if (currentPath === "/coach" || currentPath === "/coach/") {
+  // Parse hash-based routing
+  const hashPath = currentHash.split("?")[0]; // Get path without query params
+
+  // Simple routing based on hash
+  if (hashPath === "#/coach" || hashPath === "#/coach/") {
     return <CoachApp />;
   }
 
-  if (currentPath === "/coach-search" || currentPath === "/coach-search/") {
+  if (hashPath === "#/coach-search" || hashPath === "#/coach-search/") {
     return <CoachSearch />;
   }
 
-  // Default to regular app
+  // Default to regular app (home page)
   return <App />;
 }
 

@@ -35,8 +35,8 @@ function CoachSearch() {
   };
 
   const handleCoachSelect = (coach: CoachListItem) => {
-    // Navigate to coach wrapped with query params
-    window.location.href = `/coach?firstName=${encodeURIComponent(
+    // Navigate to coach wrapped with query params (hash-based routing)
+    window.location.hash = `#/coach?firstName=${encodeURIComponent(
       coach.firstName
     )}&lastName=${encodeURIComponent(coach.lastName)}`;
   };
@@ -65,7 +65,7 @@ function CoachSearch() {
 
         <div className="form-container">
           <button
-            onClick={() => (window.location.href = "/")}
+            onClick={() => (window.location.hash = "")}
             className="student-link-btn"
           >
             ← Back to Student Wrapped
