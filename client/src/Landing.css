@@ -1,0 +1,164 @@
+:root {
+  --mad-green: #06c7a6;
+  --mad-light-green: #39d6bc;
+  --mad-dark-green: #048d77;
+}
+
+/* Landing needs a scrollable, top-aligned body (index.css locks it for the app) */
+body:has(.landing) {
+  overflow-y: auto;
+  height: auto;
+  display: block;
+}
+
+.landing {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-family: "Rubik", -apple-system, BlinkMacSystemFont, sans-serif;
+  padding: 3rem 1.5rem;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.landing-bg {
+  position: fixed;
+  inset: 0;
+  background-image: url("/background.jpeg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(2px);
+  z-index: -2;
+}
+
+.landing-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.82);
+  z-index: -1;
+}
+
+.landing-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 640px;
+  width: 100%;
+}
+
+.landing-logo {
+  width: min(320px, 80vw);
+  height: auto;
+  margin-bottom: 1.75rem;
+}
+
+.landing-badge {
+  font-family: "Bank Gothic", "BankGothic Lt BT", "Bank Sans", "Rubik",
+    -apple-system, BlinkMacSystemFont, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 0.8rem;
+  color: var(--mad-green);
+  border: 1px solid rgba(6, 199, 166, 0.4);
+  border-radius: 999px;
+  padding: 0.4rem 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.landing-headline {
+  font-size: clamp(1.8rem, 5vw, 2.9rem);
+  line-height: 1.12;
+  font-weight: 700;
+  margin: 0 0 1.25rem;
+}
+
+.landing-subhead {
+  font-size: clamp(1rem, 2.4vw, 1.15rem);
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.82);
+  max-width: 540px;
+  margin: 0 0 2.5rem;
+}
+
+.landing-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.landing-btn {
+  display: inline-block;
+  padding: 0.85rem 1.75rem;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.landing-btn-primary {
+  background-color: var(--mad-green);
+  color: #06120f;
+  box-shadow: 0 4px 14px rgba(6, 199, 166, 0.35);
+}
+
+.landing-btn-primary:hover {
+  background-color: var(--mad-light-green);
+  transform: translateY(-2px);
+}
+
+.landing-btn-ghost {
+  background-color: transparent;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.landing-btn-ghost:hover {
+  border-color: var(--mad-green);
+  color: var(--mad-green);
+  transform: translateY(-2px);
+}
+
+.landing-footer {
+  margin-top: 3.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.landing-footer-links {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.landing-footer-links a {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.landing-footer-links a:hover {
+  color: var(--mad-green);
+}
+
+.landing-footer-sep {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.landing-copyright {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.5);
+}

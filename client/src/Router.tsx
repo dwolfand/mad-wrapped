@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import App from "./App";
 import CoachApp from "./CoachApp";
 import CoachSearch from "./CoachSearch";
+import Landing from "./Landing";
 
 function Router() {
   // Use hash for routing (GitHub Pages compatible)
@@ -29,8 +30,21 @@ function Router() {
     return <CoachSearch />;
   }
 
-  // Default to regular app (home page)
-  return <App />;
+  // The MAD Wrapped experience lives at #/wrapped. Existing direct links carry a
+  // clientId query param (e.g. /?clientId=...&studioId=...) — keep those working.
+  const hasClientId = new URLSearchParams(window.location.search).has(
+    "clientId"
+  );
+  if (
+    hashPath === "#/wrapped" ||
+    hashPath === "#/wrapped/" ||
+    hasClientId
+  ) {
+    return <App />;
+  }
+
+  // Public landing page (home page).
+  return <Landing />;
 }
 
 export default Router;
