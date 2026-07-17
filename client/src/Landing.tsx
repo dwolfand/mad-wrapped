@@ -48,21 +48,9 @@ function Landing() {
         <nav className="landing-footer-links">
           <a href="#/wrapped">MAD Wrapped</a>
           <span className="landing-footer-sep">·</span>
-          <a
-            href="https://madabolic.com/privacy-policy/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Privacy Policy
-          </a>
+          <a href="/privacy/">Privacy Policy</a>
           <span className="landing-footer-sep">·</span>
-          <a
-            href="https://madabolic.com/terms/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Terms of Service
-          </a>
+          <a href="/terms/">Terms of Service</a>
         </nav>
         <div className="landing-copyright">
           © {new Date().getFullYear()} MADabolic. All rights reserved.
